@@ -10,12 +10,10 @@ echo "  $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 echo "============================================"
 
 export PYTHONPATH=/app
-export DATABASE_URL  # Force export for subprocess (Render fix)
 
 # ---- 1. DIAGNOSTIC ----
 echo ""
 echo "[1/4] DIAGNOSTIC"
-echo "  DATABASE_URL present: $(if [ -n \"$DATABASE_URL\" ]; then echo 'YES'; else echo 'NO'; fi)"
 echo "  PORT: ${PORT:-8000}"
 echo "  Files: $(ls /app | tr '\n' ' ')"
 echo "  alembic dir: $(if [ -d /app/alembic ]; then echo 'EXISTS'; else echo 'MISSING'; fi)"
@@ -23,12 +21,20 @@ echo "  alembic dir: $(if [ -d /app/alembic ]; then echo 'EXISTS'; else echo 'MI
 # ---- 2. CREATE TABLES ----
 echo ""
 echo "[2/4] CREATING DATABASE TABLES"
-python3 << 'PYEOF'
+
+# Ensure DATABASE_URL is available
+if [ -z "$DATABASE_URL" ]; then
+  echo "  FATAL: DATABASE_URL is empty"
+  exit 1
+fi
+
+# Write Python script to temp file (avoids heredoc env issues)
+cat > /tmp/create_tables.py << 'PYEOF'
 import os, sys, importlib
 
 db_url = os.environ.get("DATABASE_URL", "")
 if not db_url:
-    print("  FATAL: DATABASE_URL not set")
+    print("  FATAL: DATABASE_URL not in os.environ")
     sys.exit(1)
 
 from urllib.parse import urlparse
@@ -67,6 +73,8 @@ after = len(inspector.get_table_names())
 print(f"  Tables: {before} -> {after} (created {after - before})")
 engine.dispose()
 PYEOF
+
+DATABASE_URL="$DATABASE_URL" python3 /tmp/create_tables.py
 
 # ---- 3. ALEMBIC STAMP ----
 echo ""
