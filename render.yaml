@@ -86,7 +86,7 @@ services:
     region: oregon
     plan: free
     runtime: static
-    repo: https://github.com/andrewbd507/barbearia-site
+    repo: https://github.com/andrewbdi507/barbearia-site
     branch: main
     buildCommand: cd frontend && npm install -g pnpm && pnpm install --no-frozen-lockfile && cd apps/admin && pnpm build
     staticPublishPath: ./frontend/apps/admin/dist
