@@ -11,43 +11,16 @@ echo "============================================"
 
 export PYTHONPATH=/app
 
-# ---- 0. PARSE DATABASE_URL ----
-# Render provides DATABASE_URL, but app reads DB_HOST/DB_USER/DB_PORT/DB_NAME/DB_PASSWORD
-if [ -n "$DATABASE_URL" ]; then
-  # postgresql://user:pass@host:port/dbname
-  DB_USER=$(echo "$DATABASE_URL" | sed 's|.*://||;s|:.*||')
-  DB_PASSWORD=$(echo "$DATABASE_URL" | sed 's|.*://[^:]*:||;s|@.*||')
-  DB_HOST=$(echo "$DATABASE_URL" | sed 's|.*@||;s|:.*||;s|/.*||')
-  DB_PORT=$(echo "$DATABASE_URL" | sed 's|.*:\([0-9]*\)/.*|\1|')
-  DB_NAME=$(echo "$DATABASE_URL" | sed 's|.*/||;s|\?.*||')
-  export DB_USER DB_PASSWORD DB_HOST DB_PORT DB_NAME
-  echo "  DB parsed: $DB_HOST:$DB_PORT/$DB_NAME"
-fi
-
-# ---- 1. DIAGNOSTIC ----
+# ---- 1. CREATE TABLES ----
 echo ""
-echo "[1/4] DIAGNOSTIC"
-echo "  PORT: ${PORT:-8000}"
-echo "  Files: $(ls /app | tr '\n' ' ')"
-echo "  alembic dir: $(if [ -d /app/alembic ]; then echo 'EXISTS'; else echo 'MISSING'; fi)"
+echo "[1/3] CREATING DATABASE TABLES"
 
-# ---- 2. CREATE TABLES ----
-echo ""
-echo "[2/4] CREATING DATABASE TABLES"
-
-# Ensure DATABASE_URL is available
-if [ -z "$DATABASE_URL" ]; then
-  echo "  FATAL: DATABASE_URL is empty"
-  exit 1
-fi
-
-# Write Python script to temp file (avoids heredoc env issues)
 cat > /tmp/create_tables.py << 'PYEOF'
 import os, sys, importlib
 
 db_url = os.environ.get("DATABASE_URL", "")
 if not db_url:
-    print("  FATAL: DATABASE_URL not in os.environ")
+    print("  FATAL: DATABASE_URL not set")
     sys.exit(1)
 
 from urllib.parse import urlparse
@@ -89,14 +62,15 @@ PYEOF
 
 DATABASE_URL="$DATABASE_URL" python3 /tmp/create_tables.py
 
-# ---- 3. ALEMBIC STAMP ----
+# ---- 2. ALEMBIC STAMP ----
 echo ""
-echo "[3/4] ALEMBIC STAMP"
+echo "[2/3] ALEMBIC STAMP"
 PYTHONPATH=/app alembic -c /app/alembic/alembic.ini stamp head 2>/dev/null && \
   echo "  Alembic stamped OK" || \
   echo "  Alembic skipped (no migrations yet)"
 
-# ---- 4. START SERVER ----
+# ---- 3. START SERVER ----
 echo ""
-echo "[4/4] STARTING SERVER on :${PORT:-8000}"
+echo "[3/3] STARTING SERVER on :${PORT:-8000}"
+exec uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port "${PORT:-8000}"
 exec uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port "${PORT:-8000}"

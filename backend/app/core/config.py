@@ -10,6 +10,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
+from urllib.parse import urlparse
+
 from pydantic import Field, SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -17,10 +19,18 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 class DatabaseSettings(BaseSettings):
-    """Configurações de banco de dados."""
+    """Configurações de banco de dados.
 
-    model_config = SettingsConfigDict(env_prefix="DB_")
+    Lê DATABASE_URL diretamente (Render, Heroku, etc.) com fallback
+    para variáveis DB_* individuais.
+    """
 
+    model_config = SettingsConfigDict(env_prefix="DB_", extra="allow")
+
+    # Fonte primária: DATABASE_URL (setado pelo Render)
+    database_url: str | None = Field(default=None, alias="DATABASE_URL")
+
+    # Fallback: variáveis DB_* individuais
     host: str = Field(default="localhost")
     port: int = Field(default=5432)
     user: str = Field(default="barbershop")
@@ -31,20 +41,30 @@ class DatabaseSettings(BaseSettings):
     echo: bool = Field(default=False)
 
     @property
+    def _parsed(self) -> tuple[str, str, int, str, str]:
+        """Parse DATABASE_URL or return DB_* values."""
+        if self.database_url:
+            u = urlparse(self.database_url)
+            return (
+                u.hostname or "localhost",
+                u.username or "barbershop",
+                u.port or 5432,
+                u.password or "",
+                u.path.lstrip("/") or "barbershop",
+            )
+        return (self.host, self.user, self.port, self.password.get_secret_value(), self.name)
+
+    @property
     def dsn(self) -> str:
-        return (
-            f"postgresql+asyncpg://{self.user}:"
-            f"{self.password.get_secret_value()}"
-            f"@{self.host}:{self.port}/{self.name}"
-        )
+        """Async DSN (postgresql+asyncpg://)."""
+        host, user, port, pw, db = self._parsed
+        return f"postgresql+asyncpg://{user}:{pw}@{host}:{port}/{db}"
 
     @property
     def sync_dsn(self) -> str:
-        return (
-            f"postgresql+psycopg2://{self.user}:"
-            f"{self.password.get_secret_value()}"
-            f"@{self.host}:{self.port}/{self.name}"
-        )
+        """Sync DSN (postgresql+psycopg2://) para Alembic/create_all."""
+        host, user, port, pw, db = self._parsed
+        return f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
 
 
 class RedisSettings(BaseSettings):
