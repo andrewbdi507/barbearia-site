@@ -10,7 +10,7 @@ import { FinancialPage } from "./pages/FinancialPage";
 import { ReportsPage } from "./pages/ReportsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { ThemeConfigPage } from "./pages/ThemeConfigPage";
-import { AgentsPage } from "./pages/AgentsPage";
+import AgentsPage from "./pages/AgentsPage";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const token = sessionStorage.getItem("access_token");
