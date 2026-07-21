@@ -41,7 +41,7 @@ class DatabaseSettings(BaseSettings):
     @property
     def sync_dsn(self) -> str:
         return (
-            f"postgresql+psycopg://{self.user}:"
+            f"postgresql+psycopg2://{self.user}:"
             f"{self.password.get_secret_value()}"
             f"@{self.host}:{self.port}/{self.name}"
         )

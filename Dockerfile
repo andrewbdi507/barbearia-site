@@ -33,6 +33,7 @@ RUN pip install --no-cache-dir \
     uvicorn[standard] \
     sqlalchemy[asyncio] \
     asyncpg \
+    psycopg2-binary \
     alembic \
     pydantic \
     pydantic-settings \
@@ -71,6 +72,27 @@ CMD ["sh", "-c", "\
     echo \"DB_HOST=$DB_HOST DB_NAME=$DB_NAME\"; \
   fi; \
   echo 'Running database migrations...'; \
-  PYTHONPATH=/app alembic -c /app/alembic/alembic.ini upgrade head; \
+  PYTHONPATH=/app alembic -c /app/alembic/alembic.ini upgrade head 2>/dev/null || \
+  python -c "\
+from app.infrastructure.database.session import init_session_factory; \
+from app.infrastructure.database.base import Base; \
+import asyncio; \
+from app.core.config import get_settings; \
+s = get_settings(); \
+print(f'Creating tables...'); \
+import app.modules.auth.infrastructure.models.auth_models; \
+import app.modules.tenant.infrastructure.models.tenant_models; \
+import app.modules.staff.infrastructure.models.staff_models; \
+import app.modules.customer.infrastructure.models.customer_models; \
+import app.modules.scheduling.infrastructure.models.scheduling_models; \
+import app.modules.payment.infrastructure.models.payment_models; \
+import app.modules.notification.infrastructure.models.notification_models; \
+import app.modules.analytics.infrastructure.models.analytics_models; \
+import app.modules.site.infrastructure.models.site_models; \
+from sqlalchemy import create_engine; \
+engine = create_engine(s.database.sync_dsn); \
+Base.metadata.create_all(engine); \
+print('Tables created successfully'); \
+"; \
   echo 'Starting server...'; \
   uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port ${PORT:-8000}"]

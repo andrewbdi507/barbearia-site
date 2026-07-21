@@ -22,6 +22,17 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from app.core.config import get_settings
 from app.infrastructure.database import Base
 
+# Import all models so they register with Base.metadata
+import app.modules.auth.infrastructure.models.auth_models  # noqa: F401
+import app.modules.tenant.infrastructure.models.tenant_models  # noqa: F401
+import app.modules.staff.infrastructure.models.staff_models  # noqa: F401
+import app.modules.customer.infrastructure.models.customer_models  # noqa: F401
+import app.modules.scheduling.infrastructure.models.scheduling_models  # noqa: F401
+import app.modules.payment.infrastructure.models.payment_models  # noqa: F401
+import app.modules.notification.infrastructure.models.notification_models  # noqa: F401
+import app.modules.analytics.infrastructure.models.analytics_models  # noqa: F401
+import app.modules.site.infrastructure.models.site_models  # noqa: F401
+
 # Alembic Config object
 config = context.config
 
