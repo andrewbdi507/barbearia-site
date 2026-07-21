@@ -75,22 +75,10 @@ export function GalleryPage() {
               transition={{ delay: i * 0.05 }} whileHover={{ scale: 1.02 }}
               className="aspect-square rounded-2xl border border-white/5 bg-white/[0.02] flex items-center justify-center text-white/10 text-sm">
               Imagem {i + 1}
-            </motion.div>))}
-        </div></div></div>);}
-          <div key={i} className="aspect-square rounded-lg bg-surface-hover border border-border flex items-center justify-center text-text-disabled">
-            📸 Foto {i + 1}
-          </div>
-        ))}
+            </motion.div>
+          ))}
+        </div>
       </div>
-    </div>
-  );
-}
-
-export function ProfilePage() {
-  return (
-    <div className="mx-auto max-w-3xl px-4 py-12 animate-fade-in">
-      <h1 className="text-2xl font-bold mb-2">Meu Perfil</h1>
-      <p className="text-text-secondary">Gerencie seus dados e veja seu histórico.</p>
     </div>
   );
 }
