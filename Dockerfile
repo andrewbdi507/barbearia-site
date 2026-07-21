@@ -58,5 +58,19 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=15s \
     CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-# Render injects PORT env var
-CMD ["sh", "-c", "uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port ${PORT:-8000}"]
+# Startup: parse DATABASE_URL (Render format) → DB_* vars, run migrations, start server
+CMD ["sh", "-c", "\
+  if [ -n \"$DATABASE_URL\" ]; then \
+    echo \"Parsing DATABASE_URL...\"; \
+    DB_USER=$(echo $DATABASE_URL | sed -n 's|.*://\\([^:]*\\):.*|\\1|p'); \
+    DB_PASSWORD=$(echo $DATABASE_URL | sed -n 's|.*://[^:]*:\\([^@]*\\)@.*|\\1|p'); \
+    DB_HOST=$(echo $DATABASE_URL | sed -n 's|.*@\\([^:/]*\\).*|\\1|p'); \
+    DB_PORT=$(echo $DATABASE_URL | sed -n 's|.*:\\([0-9]*\\)/.*|\\1|p'); \
+    DB_NAME=$(echo $DATABASE_URL | sed -n 's|.*/\\([^?]*\\).*|\\1|p'); \
+    export DB_USER DB_PASSWORD DB_HOST DB_PORT DB_NAME; \
+    echo \"DB_HOST=$DB_HOST DB_NAME=$DB_NAME\"; \
+  fi; \
+  echo 'Running database migrations...'; \
+  alembic upgrade head; \
+  echo 'Starting server...'; \
+  uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port ${PORT:-8000}"]
