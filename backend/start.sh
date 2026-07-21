@@ -69,9 +69,9 @@ with engine.connect() as conn:
         conn.execute(text("""
             INSERT INTO plans (id, slug, name, tier, price_monthly, price_yearly, limits, features, is_active, is_public, sort_order, created_at, updated_at)
             VALUES 
-            (gen_random_uuid(), 'starter', 'Starter', 'starter', 4900, 47040, '{"max_bookings":100,"max_staff":1}', '["booking","basic_reports"]', true, true, 1, now(), now()),
-            (gen_random_uuid(), 'pro', 'Pro', 'pro', 9900, 95040, '{"max_bookings":999999,"max_staff":5}', '["booking","reports","whatsapp","priority_support"]', true, true, 2, now(), now()),
-            (gen_random_uuid(), 'premium', 'Premium', 'premium', 19900, 191040, '{"max_bookings":999999,"max_staff":999999}', '["booking","reports","whatsapp","priority_support","api_access","white_label"]', true, true, 3, now(), now())
+            (gen_random_uuid(), 'starter', 'Starter', 'starter', 4900, 47040, '{"max_bookings": 100, "max_staff": 1}'::jsonb, '["booking", "basic_reports"]'::jsonb, true, true, 1, now(), now()),
+            (gen_random_uuid(), 'pro', 'Pro', 'pro', 9900, 95040, '{"max_bookings": 999999, "max_staff": 5}'::jsonb, '["booking", "reports", "whatsapp", "priority_support"]'::jsonb, true, true, 2, now(), now()),
+            (gen_random_uuid(), 'premium', 'Premium', 'premium', 19900, 191040, '{"max_bookings": 999999, "max_staff": 999999}'::jsonb, '["booking", "reports", "whatsapp", "priority_support", "api_access", "white_label"]'::jsonb, true, true, 3, now(), now())
         """))
         conn.commit()
         print("  Default plans seeded")
