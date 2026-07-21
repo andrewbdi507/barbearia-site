@@ -14,15 +14,15 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from src.core.config import get_settings
-from src.infrastructure.database import Base
+from app.core.config import get_settings
+from app.infrastructure.database import Base
 
 # Alembic Config object
 config = context.config
 
 # Set the SQLAlchemy URL from our settings
 settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.database.url_sync)
+config.set_main_option("sqlalchemy.url", settings.database.sync_dsn)
 
 # Setup loggers
 if config.config_file_name is not None:
