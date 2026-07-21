@@ -1,6 +1,6 @@
 /** API Client — complete typed wrapper for all backend endpoints */
 
-const API = "/api/v1";
+const API = `${import.meta.env.VITE_API_URL || ""}/api/v1`;
 
 // ---- Helpers ----
 
