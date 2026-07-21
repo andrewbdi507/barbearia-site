@@ -68,7 +68,8 @@ export function BookingPage() {
   const afternoonSlots = ["13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"];
 
   return (
-    <div className="mx-auto max-w-lg px-4 py-8 animate-fade-in">
+    <div className="min-h-screen bg-[#0D0D0D] pt-24 pb-24 px-6">
+      <div className="mx-auto max-w-2xl">
       {/* Progress */}
       <div className="flex items-center justify-between mb-8">
         {steps.map((s) => (

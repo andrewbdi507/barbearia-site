@@ -1,10 +1,13 @@
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Button, Card } from "@barbershop/design-system";
 import { CheckCircle, CalendarPlus, MapPin, Clock } from "lucide-react";
 
 export function ConfirmationPage() {
   return (
-    <div className="mx-auto max-w-lg px-4 py-12 text-center animate-scale-in">
+    <div className="min-h-screen bg-[#0D0D0D] pt-24 pb-24 px-6 flex items-center justify-center">
+      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
+        className="max-w-lg w-full text-center">
       {/* Success Icon */}
       <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-success/10">
         <CheckCircle className="h-10 w-10 text-success" />
