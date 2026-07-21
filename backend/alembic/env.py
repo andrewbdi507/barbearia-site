@@ -38,7 +38,7 @@ config = context.config
 
 # Set the SQLAlchemy URL from our settings
 settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.database.sync_dsn)
+config.set_main_option("sqlalchemy.url", settings.db.sync_dsn)
 
 # Setup loggers
 if config.config_file_name is not None:

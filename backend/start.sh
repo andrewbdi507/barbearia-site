@@ -44,7 +44,7 @@ for mod in modules:
         print(f'Warning: could not import {mod}: {e}')
 
 settings = get_settings()
-engine = create_engine(settings.database.sync_dsn)
+engine = create_engine(settings.db.sync_dsn)
 Base.metadata.create_all(engine)
 print('Tables created successfully')
 engine.dispose()
