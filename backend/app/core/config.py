@@ -62,9 +62,12 @@ class DatabaseSettings(BaseSettings):
 
     @property
     def sync_dsn(self) -> str:
-        """Sync DSN (postgresql+psycopg2://) para Alembic/create_all."""
+        """Sync DSN (postgresql+psycopg2://) para Alembic/create_all. Inclui SSL para Render."""
         host, user, port, pw, db = self._parsed
-        return f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+        base = f"postgresql+psycopg2://{user}:{pw}@{host}:{port}/{db}"
+        if "render.com" in host:
+            base += "?sslmode=require"
+        return base
 
 
 class RedisSettings(BaseSettings):

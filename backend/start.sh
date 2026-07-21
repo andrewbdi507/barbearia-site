@@ -30,6 +30,9 @@ print(f"  Host: {p.hostname}:{p.port or 5432}/{p.path.lstrip('/')}")
 sync_url = db_url.replace("+asyncpg", "+psycopg2")
 if "+psycopg2" not in sync_url:
     sync_url = sync_url.replace("postgresql://", "postgresql+psycopg2://")
+# Render requires SSL
+if "render.com" in sync_url and "sslmode" not in sync_url:
+    sync_url += "?sslmode=require"
 
 from sqlalchemy import create_engine, inspect
 from app.infrastructure.database.base import Base

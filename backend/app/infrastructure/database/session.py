@@ -46,6 +46,7 @@ def init_session_factory(settings: Any) -> None:
         pool_timeout=getattr(db, "pool_timeout", 30),
         echo=db.echo,
         pool_pre_ping=True,
+        connect_args={"ssl": "require"} if "render.com" in db.dsn else {},
     )
     _session_factory = async_sessionmaker(
         _engine,
