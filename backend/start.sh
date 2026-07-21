@@ -10,6 +10,7 @@ echo "  $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 echo "============================================"
 
 export PYTHONPATH=/app
+export DATABASE_URL  # Force export for subprocess (Render fix)
 
 # ---- 1. DIAGNOSTIC ----
 echo ""
