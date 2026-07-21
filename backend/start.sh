@@ -60,6 +60,24 @@ before = len(inspector.get_table_names())
 Base.metadata.create_all(engine)
 after = len(inspector.get_table_names())
 print(f"  Tables: {before} -> {after} (created {after - before})")
+
+# Seed default plans if not exist
+from sqlalchemy import text
+with engine.connect() as conn:
+    existing = conn.execute(text("SELECT COUNT(*) FROM plans")).scalar()
+    if existing == 0:
+        conn.execute(text("""
+            INSERT INTO plans (id, slug, name, price_cents, max_bookings, max_staff, is_active, created_at, updated_at)
+            VALUES 
+            (gen_random_uuid(), 'starter', 'Starter', 4900, 100, 1, true, now(), now()),
+            (gen_random_uuid(), 'pro', 'Pro', 9900, 999999, 5, true, now(), now()),
+            (gen_random_uuid(), 'premium', 'Premium', 19900, 999999, 999999, true, now(), now())
+        """))
+        conn.commit()
+        print("  Default plans seeded")
+    else:
+        print(f"  Plans already exist: {existing}")
+
 engine.dispose()
 PYEOF
 
