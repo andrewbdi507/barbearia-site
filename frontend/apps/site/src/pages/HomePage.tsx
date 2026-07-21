@@ -218,10 +218,3 @@ export function HomePage() {
     </div>
   );
 }
-        <div className="h-64 bg-surface-hover rounded-lg flex items-center justify-center text-text-secondary border border-border">
-          🗺️ Google Maps (embed)
-        </div>
-      </section>
-    </div>
-  );
-}
