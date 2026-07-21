@@ -71,6 +71,6 @@ CMD ["sh", "-c", "\
     echo \"DB_HOST=$DB_HOST DB_NAME=$DB_NAME\"; \
   fi; \
   echo 'Running database migrations...'; \
-  alembic -c alembic/alembic.ini upgrade head; \
+  cd alembic && alembic upgrade head && cd ..; \
   echo 'Starting server...'; \
   uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port ${PORT:-8000}"]
