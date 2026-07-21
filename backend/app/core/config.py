@@ -108,8 +108,23 @@ class SecuritySettings(BaseSettings):
     max_login_attempts: int = Field(default=5, ge=3, le=10)
     lockout_duration_minutes: int = Field(default=15, ge=5, le=60)
     cors_origins: list[str] = Field(
-        default_factory=lambda: ["http://localhost:5173", "http://localhost:3000"],
+        default_factory=lambda: [
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "https://agendaos-frontend.onrender.com",
+        ],
     )
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def parse_cors(cls, v: object) -> list[str]:
+        if isinstance(v, str):
+            # Handle comma-separated or JSON string
+            v = v.strip()
+            if v.startswith("["):
+                import json
+                return json.loads(v)
+            return [u.strip() for u in v.split(",")]
+        return v if isinstance(v, list) else []
     allowed_hosts: list[str] = Field(
         default_factory=lambda: ["*.barbeariaos.com.br", "localhost"],
     )
