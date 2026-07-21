@@ -316,5 +316,6 @@ export function BookingPage() {
         </div>
       )}
     </div>
+    </div>
   );
 }
