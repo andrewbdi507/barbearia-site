@@ -11,6 +11,19 @@ echo "============================================"
 
 export PYTHONPATH=/app
 
+# ---- 0. PARSE DATABASE_URL ----
+# Render provides DATABASE_URL, but app reads DB_HOST/DB_USER/DB_PORT/DB_NAME/DB_PASSWORD
+if [ -n "$DATABASE_URL" ]; then
+  # postgresql://user:pass@host:port/dbname
+  DB_USER=$(echo "$DATABASE_URL" | sed 's|.*://||;s|:.*||')
+  DB_PASSWORD=$(echo "$DATABASE_URL" | sed 's|.*://[^:]*:||;s|@.*||')
+  DB_HOST=$(echo "$DATABASE_URL" | sed 's|.*@||;s|:.*||;s|/.*||')
+  DB_PORT=$(echo "$DATABASE_URL" | sed 's|.*:\([0-9]*\)/.*|\1|')
+  DB_NAME=$(echo "$DATABASE_URL" | sed 's|.*/||;s|\?.*||')
+  export DB_USER DB_PASSWORD DB_HOST DB_PORT DB_NAME
+  echo "  DB parsed: $DB_HOST:$DB_PORT/$DB_NAME"
+fi
+
 # ---- 1. DIAGNOSTIC ----
 echo ""
 echo "[1/4] DIAGNOSTIC"
