@@ -4,26 +4,25 @@
 # ============================================================
 
 set -e
-
-echo "Parsing DATABASE_URL..."
-if [ -n "$DATABASE_URL" ]; then
-  DB_USER=$(echo "$DATABASE_URL" | sed -n 's|.*://\([^:]*\):.*|\1|p')
-  DB_PASSWORD=$(echo "$DATABASE_URL" | sed -n 's|.*://[^:]*:\([^@]*\)@.*|\1|p')
-  DB_HOST=$(echo "$DATABASE_URL" | sed -n 's|.*@\([^:/]*\).*|\1|p')
-  DB_PORT=$(echo "$DATABASE_URL" | sed -n 's|.*:\([0-9]*\)/.*|\1|p')
-  DB_NAME=$(echo "$DATABASE_URL" | sed -n 's|.*/\([^?]*\).*|\1|p')
-  export DB_USER DB_PASSWORD DB_HOST DB_PORT DB_NAME
-  echo "DB_HOST=$DB_HOST DB_NAME=$DB_NAME"
-fi
-
 export PYTHONPATH=/app
 
-echo "Running database migrations..."
+echo "DATABASE_URL present: $(if [ -n \"$DATABASE_URL\" ]; then echo YES; else echo NO; fi)"
+
+echo "Creating database tables..."
 python -c "
-import importlib
-from app.core.config import get_settings
+import os, importlib
 from app.infrastructure.database.base import Base
 from sqlalchemy import create_engine
+
+# Use DATABASE_URL directly if available, otherwise construct from DB_* vars
+db_url = os.environ.get('DATABASE_URL', '')
+if not db_url:
+    from app.core.config import get_settings
+    db_url = get_settings().db.sync_dsn
+# Replace asyncpg with psycopg2 for sync connection
+db_url = db_url.replace('+asyncpg', '+psycopg2')
+
+print(f'Connecting to database...')
 
 # Import all models to register with Base.metadata
 modules = [
@@ -43,8 +42,7 @@ for mod in modules:
     except Exception as e:
         print(f'Warning: could not import {mod}: {e}')
 
-settings = get_settings()
-engine = create_engine(settings.db.sync_dsn)
+engine = create_engine(db_url)
 Base.metadata.create_all(engine)
 print('Tables created successfully')
 engine.dispose()
