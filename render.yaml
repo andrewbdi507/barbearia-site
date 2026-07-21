@@ -1,0 +1,105 @@
+# ============================================================
+# AGENDA OS — Render Blueprint (render.yaml)
+# ============================================================
+# One-click deploy: Backend (Web Service) + Frontend (Static Site)
+# Docs: https://render.com/docs/blueprint-spec
+# ============================================================
+
+services:
+  # ---- Backend API (Web Service - Docker) ----
+  - type: web
+    name: agendaos-backend
+    region: oregon
+    plan: free
+    runtime: docker
+    repo: https://github.com/andrewbd507/barbearia-site
+    branch: main
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    numInstances: 1
+    envVars:
+      # ---- Database (Render PostgreSQL) ----
+      - key: DATABASE_URL
+        fromDatabase:
+          name: barbearia_owe0
+          property: connectionString
+      # ---- Redis (Render Key-Value) ----
+      - key: REDIS_URL
+        fromService:
+          name: agendaos-redis
+          type: redis
+          property: connectionString
+      # ---- App ----
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_NAME
+        value: agendaos
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_ALGORITHM
+        value: HS256
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      # ---- CORS ----
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://agendaos-frontend.onrender.com
+      # ---- Feature Flags ----
+      - key: FEATURE_PAYMENTS_ENABLED
+        value: "false"
+      - key: FEATURE_WHATSAPP_ENABLED
+        value: "false"
+      - key: FEATURE_EMAIL_ENABLED
+        value: "false"
+      - key: FEATURE_AGENTS_ENABLED
+        value: "false"
+      # ---- Rate Limiting ----
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: RATE_LIMIT_REQUESTS
+        value: "100"
+      - key: BRUTE_FORCE_ENABLED
+        value: "true"
+      - key: BRUTE_FORCE_MAX_ATTEMPTS
+        value: "5"
+      # ---- Storage ----
+      - key: STORAGE_PROVIDER
+        value: local
+      # ---- Agent URLs (disabled on free tier) ----
+      - key: AND_AGENT_ENABLED
+        value: "false"
+      - key: HERMES_AGENT_ENABLED
+        value: "false"
+      - key: EVOLVER_ENABLED
+        value: "false"
+      - key: GENERIC_AGENT_ENABLED
+        value: "false"
+      - key: CLAUDE_MEM_ENABLED
+        value: "false"
+      - key: AGENT_TIMEOUT
+        value: "30"
+
+  # ---- Frontend (Static Site) ----
+  - type: web
+    name: agendaos-frontend
+    region: oregon
+    plan: free
+    runtime: static
+    repo: https://github.com/andrewbd507/barbearia-site
+    branch: main
+    buildCommand: cd frontend && npm install -g pnpm && pnpm install --no-frozen-lockfile && cd apps/admin && pnpm build
+    staticPublishPath: ./frontend/apps/admin/dist
+    pullRequestPreviewsEnabled: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: agendaos-backend
+          type: web
+          property: url
+      - key: VITE_APP_ENV
+        value: production

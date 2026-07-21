@@ -1,0 +1,1 @@
+"""Notification Module — Domain Layer."""

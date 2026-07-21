@@ -1,0 +1,371 @@
+# ============================================================
+# CI/CD Pipeline — Barbershop SaaS
+# ============================================================
+# Triggers: push to main, PR to main, manual dispatch.
+#
+# Stages:
+#   1. Quality (lint, type-check, security scan)
+#   2. Test (unit + integration + e2e)
+#   3. Build (Docker images)
+#   4. Deploy Staging (automatic)
+#   5. Deploy Production (manual approval)
+
+name: CI/CD — Build, Test & Deploy
+
+on:
+  push:
+    branches: [main, develop]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_production:
+        description: "Deploy to production?"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOCKER_REGISTRY: ghcr.io/${{ github.repository_owner }}
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  # ============================================================
+  # Stage 1: Quality Gates
+  # ============================================================
+  quality:
+    name: 🔍 Quality Gates
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Setup Python ${{ env.PYTHON_VERSION }}
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Ruff — Lint
+        run: uv run ruff check app/ tests/
+
+      - name: Ruff — Format Check
+        run: uv run ruff format --check app/ tests/
+
+      - name: MyPy — Type Check
+        run: uv run mypy app/ --strict
+
+      - name: Bandit — Security Scan
+        run: |
+          uv pip install bandit
+          uv run bandit -r app/ -c pyproject.toml -f json -o bandit-report.json || true
+
+      - name: pip-audit — Dependency Vulnerabilities
+        run: |
+          uv pip install pip-audit
+          uv run pip-audit --format json --output pip-audit.json || true
+
+      - name: Upload Security Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            backend/bandit-report.json
+            backend/pip-audit.json
+
+  # ============================================================
+  # Stage 2: Tests
+  # ============================================================
+  test:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    needs: quality
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: barbershop_test
+          POSTGRES_PASSWORD: barbershop_test
+          POSTGRES_DB: barbershop_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Setup Python
+        run: uv python install ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Unit Tests
+        env:
+          APP_ENV: testing
+          DATABASE_URL: postgresql+asyncpg://barbershop_test:barbershop_test@localhost:5432/barbershop_test
+          DATABASE_URL_SYNC: postgresql://barbershop_test:barbershop_test@localhost:5432/barbershop_test
+          REDIS_URL: redis://localhost:6379/0
+          SECRET_KEY: ci-test-secret-key-not-production
+        run: uv run pytest tests/unit/ -v --cov=app --cov-report=xml:reports/coverage-unit.xml --junitxml=reports/junit-unit.xml
+
+      - name: Integration Tests
+        env:
+          APP_ENV: testing
+          DATABASE_URL: postgresql+asyncpg://barbershop_test:barbershop_test@localhost:5432/barbershop_test
+          DATABASE_URL_SYNC: postgresql://barbershop_test:barbershop_test@localhost:5432/barbershop_test
+          REDIS_URL: redis://localhost:6379/1
+          SECRET_KEY: ci-test-secret-key-not-production
+        run: uv run pytest tests/integration/ -v --cov=app --cov-append --cov-report=xml:reports/coverage-integration.xml --junitxml=reports/junit-integration.xml
+
+      - name: E2E Tests
+        env:
+          APP_ENV: testing
+          DATABASE_URL: postgresql+asyncpg://barbershop_test:barbershop_test@localhost:5432/barbershop_test
+          DATABASE_URL_SYNC: postgresql://barbershop_test:barbershop_test@localhost:5432/barbershop_test
+          REDIS_URL: redis://localhost:6379/2
+          SECRET_KEY: ci-test-secret-key-not-production
+        run: uv run pytest tests/e2e/ -v --cov=app --cov-append --cov-report=xml:reports/coverage-e2e.xml --junitxml=reports/junit-e2e.xml
+
+      - name: Coverage Report
+        run: uv run coverage report --fail-under=90
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports
+          path: backend/reports/
+
+  # ============================================================
+  # Stage 3: Build Docker Images
+  # ============================================================
+  build:
+    name: 🐳 Build Images
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')
+    strategy:
+      matrix:
+        image:
+          - { name: backend, context: ./backend, dockerfile: docker/backend/Dockerfile }
+          - { name: worker, context: ./backend, dockerfile: docker/worker/Dockerfile }
+          - { name: scheduler, context: ./backend, dockerfile: docker/scheduler/Dockerfile }
+          - { name: frontend, context: ./frontend, dockerfile: docker/frontend/Dockerfile }
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ matrix.image.name }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=sha,prefix=,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build & Push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.image.context }}
+          file: ${{ matrix.image.dockerfile }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Scan Image (Trivy)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.DOCKER_REGISTRY }}/${{ matrix.image.name }}:${{ steps.meta.outputs.version }}
+          format: sarif
+          output: trivy-${{ matrix.image.name }}.sarif
+          severity: CRITICAL,HIGH
+          exit-code: 0
+
+      - name: Upload Trivy Results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-${{ matrix.image.name }}.sarif
+
+  # ============================================================
+  # Stage 4: Deploy Staging
+  # ============================================================
+  deploy-staging:
+    name: 🚀 Deploy Staging
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: staging
+      url: https://staging.barbershop.local
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /opt/barbershop
+            docker compose -f docker-compose.staging.yml pull
+            docker compose -f docker-compose.staging.yml up -d --remove-orphans
+            docker image prune -af --filter "until=24h"
+
+      - name: Health Check
+        run: |
+          sleep 15
+          for i in 1 2 3 4 5; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://staging.barbershop.local/health || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Staging healthy"
+              exit 0
+            fi
+            echo "Attempt $i: HTTP $STATUS — retrying..."
+            sleep 10
+          done
+          echo "❌ Staging health check failed"
+          exit 1
+
+      - name: Smoke Tests
+        run: |
+          curl -sf https://staging.barbershop.local/health
+          curl -sf https://staging.barbershop.local/api/v1/health/live
+
+  # ============================================================
+  # Stage 5: Deploy Production
+  # ============================================================
+  deploy-production:
+    name: 🏭 Deploy Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_production == 'true'
+    environment:
+      name: production
+      url: https://app.barbershop.com
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate Deployment ID
+        id: deploy
+        run: echo "id=$(date +%Y%m%d%H%M%S)-${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
+      - name: Backup Database (pre-deploy)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd /opt/barbershop
+            bash scripts/backup-db.sh pre-deploy-${{ steps.deploy.outputs.id }}
+
+      - name: Deploy (Blue-Green)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd /opt/barbershop
+
+            # Pull new images
+            docker compose -f docker-compose.prod.yml pull
+
+            # Scale up new instances (Blue → Green)
+            docker compose -f docker-compose.prod.yml up -d --scale backend=$(( $API_REPLICAS * 2 )) --no-recreate backend
+
+            # Wait for new instances to be healthy
+            sleep 20
+            for i in 1 2 3 4 5; do
+              curl -sf http://localhost:8000/health/live && break
+              sleep 10
+            done
+
+            # Remove old instances
+            docker compose -f docker-compose.prod.yml up -d --scale backend=$API_REPLICAS backend
+
+            # Cleanup old images
+            docker image prune -af --filter "until=48h"
+
+      - name: Post-Deploy Health Check
+        run: |
+          for i in 1 2 3; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://app.barbershop.com/health || echo "000")
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Production healthy after deploy"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "❌ Post-deploy health check FAILED"
+          exit 1
+
+  # ============================================================
+  # Stage 6: Notify
+  # ============================================================
+  notify:
+    name: 📢 Notify
+    runs-on: ubuntu-latest
+    needs: [deploy-staging, deploy-production]
+    if: always() && (needs.deploy-staging.result == 'success' || needs.deploy-production.result == 'success')
+    steps:
+      - name: Slack Notification
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "🚀 Deploy completed\n• Staging: ${{ needs.deploy-staging.result }}\n• Production: ${{ needs.deploy-production.result }}\n• Commit: ${{ github.sha }}\n• Actor: ${{ github.actor }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

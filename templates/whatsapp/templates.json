@@ -1,0 +1,86 @@
+{
+  "templates": [
+    {
+      "name": "appointment_confirmation",
+      "language": "pt_BR",
+      "category": "UTILITY",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "TEXT",
+          "text": "✅ Agendamento Confirmado — {{1}}"
+        },
+        {
+          "type": "BODY",
+          "text": "Olá {{2}}! Seu horário na *{{1}}* está confirmado:\n\n📅 {{3}} às {{4}}\n💇 {{5}} ({{6}}min)\n👤 {{7}}\n💰 {{8}}\n\n📍 {{9}}\n📞 {{10}}"
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "URL",
+              "text": "📋 Ver Agendamento",
+              "url": "{{11}}"
+            }
+          ]
+        }
+      ],
+      "example": {
+        "header_text": ["Barbearia Exemplo"],
+        "body_text": ["João","15/08/2026","14:30","Corte + Barba","45","Marcos","R$ 65,00","Rua Augusta, 1234","(11) 3333-4444"],
+        "button_url": ["https://agendaos.com.br/booking/abc123"]
+      }
+    },
+    {
+      "name": "appointment_reminder",
+      "language": "pt_BR",
+      "category": "UTILITY",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "TEXT",
+          "text": "⏰ Lembrete: {{1}} amanhã!"
+        },
+        {
+          "type": "BODY",
+          "text": "Oi {{2}}! Seu horário na *{{3}}* é amanhã:\n\n⏰ {{1}}\n💇 {{4}} com {{5}}\n📍 {{6}}\n\nConfirme sua presença👇"
+        },
+        {
+          "type": "BUTTONS",
+          "buttons": [
+            {
+              "type": "URL",
+              "text": "✅ Confirmar",
+              "url": "{{7}}"
+            }
+          ]
+        }
+      ],
+      "example": {
+        "header_text": ["14:30"],
+        "body_text": ["João","Barbearia Exemplo","Corte + Barba","Marcos","Rua Augusta, 1234"],
+        "button_url": ["https://agendaos.com.br/confirm/abc123"]
+      }
+    },
+    {
+      "name": "payment_approved",
+      "language": "pt_BR",
+      "category": "UTILITY",
+      "components": [
+        {
+          "type": "HEADER",
+          "format": "TEXT",
+          "text": "💰 Pagamento Aprovado!"
+        },
+        {
+          "type": "BODY",
+          "text": "Seu pagamento de *{{1}}* foi aprovado!\n\nServiço: {{2}}\nData: {{3}}\n\nObrigado pela preferência! 🤝"
+        }
+      ],
+      "example": {
+        "header_text": ["R$ 65,00"],
+        "body_text": ["Corte + Barba","15/08/2026"]
+      }
+    }
+  ]
+}

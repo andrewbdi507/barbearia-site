@@ -1,0 +1,15 @@
+# ============================================================
+# Grafana — Dashboard Provisioning
+# ============================================================
+apiVersion: 1
+
+providers:
+  - name: "Barbershop Dashboards"
+    folder: "Barbershop SaaS"
+    type: file
+    disableDeletion: true
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: true

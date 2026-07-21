@@ -1,0 +1,182 @@
+# ============================================================
+# CI — Quick Quality Check (PRs only)
+# ============================================================
+# Full CI/CD pipeline: see ci-cd.yml
+# This workflow runs on PRs for fast feedback (< 3 min).
+
+name: CI — Quick Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================================
+  # Backend Quality
+  # ============================================================
+  backend-quality:
+    name: Backend — Lint & Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Setup Python
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Ruff (lint)
+        run: uv run ruff check app/ tests/
+
+      - name: Ruff (format check)
+        run: uv run ruff format --check app/ tests/
+
+      - name: MyPy (type check)
+        run: uv run mypy app/ --strict
+
+  # ============================================================
+  # Backend Tests
+  # ============================================================
+  backend-tests:
+    name: Backend — Tests
+    runs-on: ubuntu-latest
+    needs: backend-quality
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: barbershop
+          POSTGRES_PASSWORD: barbershop
+          POSTGRES_DB: barbershop_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Setup Python
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Run tests
+        env:
+          APP_ENV: testing
+          DATABASE_URL: postgresql+asyncpg://barbershop:barbershop@localhost:5432/barbershop_test
+          DATABASE_URL_SYNC: postgresql://barbershop:barbershop@localhost:5432/barbershop_test
+          REDIS_URL: redis://localhost:6379/1
+          SECRET_KEY: test-secret-key-for-ci-only-not-production
+        run: uv run pytest -v --cov --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: backend/coverage.xml
+          flags: backend
+
+  # ============================================================
+  # Frontend Quality
+  # ============================================================
+  frontend-quality:
+    name: Frontend — Lint & Type Check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: TypeScript check
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint || true
+
+  # ============================================================
+  # Docker Build
+  # ============================================================
+  docker-build:
+    name: Docker — Build Check
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-quality]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t barbershop-backend -f backend/docker/Dockerfile backend/
+
+      - name: Build frontend admin
+        run: |
+          echo "Frontend Docker build placeholder — será configurado com Dockerfile futuro"
+
+  # ============================================================
+  # Security Scan
+  # ============================================================
+  security-scan:
+    name: Security — SAST Scan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Setup Python
+        run: uv python install 3.13
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Bandit (SAST)
+        run: uv run bandit -r app/ -c pyproject.toml || true
+
+      - name: pip-audit
+        run: uv run pip-audit || true

@@ -1,0 +1,45 @@
+# ============================================================
+# AGENDA OS — Root .dockerignore (Render Docker Build)
+# ============================================================
+
+# Git
+.git
+.gitignore
+
+# Node (build context only needs backend)
+frontend/node_modules
+frontend/.pnpm-store
+frontend/apps/*/node_modules
+frontend/packages/*/node_modules
+
+# Python
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/.venv
+**/venv
+
+# Docker
+docker-compose*.yml
+docker/
+*.md
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests & dev tools
+**/tests/
+**/test_*.py
+.pytest_cache
+.coverage
+htmlcov/

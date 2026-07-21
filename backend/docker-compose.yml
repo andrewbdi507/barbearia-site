@@ -1,0 +1,81 @@
+# ============================================================
+# Barbershop SaaS — Docker Compose (Backend Only)
+# ============================================================
+# Use o docker-compose na raiz do projeto para o stack completo.
+#   cd .. && docker compose -f docker-compose.dev.yml up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: barbershop-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: barbershop
+      POSTGRES_PASSWORD: barbershop
+      POSTGRES_DB: barbershop_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U barbershop -d barbershop_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - barbershop-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: barbershop-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - barbershop-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: ../docker/backend/Dockerfile
+      target: development
+    container_name: barbershop-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://barbershop:barbershop@postgres:5432/barbershop_dev
+      DATABASE_URL_SYNC: postgresql://barbershop:barbershop@postgres:5432/barbershop_dev
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uv run uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - barbershop-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  barbershop-network:
+    driver: bridge
+    name: barbershop-network

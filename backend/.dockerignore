@@ -1,0 +1,52 @@
+# ============================================================
+# Barbershop SaaS — .dockerignore (Backend)
+# ============================================================
+# Reduce build context size.
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+
+# Virtual env (we install fresh in the container)
+.venv/
+venv/
+env/
+
+# Tests
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+reports/
+
+# Git
+.git/
+.gitignore
+
+# Docs
+docs/
+*.md
+!README.md
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Environment (secrets must never enter the image)
+.env*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db

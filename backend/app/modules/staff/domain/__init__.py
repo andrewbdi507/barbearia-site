@@ -1,0 +1,1 @@
+"""Staff Module — Domain Layer."""

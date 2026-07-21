@@ -1,0 +1,29 @@
+"""Media Module — Repository Interfaces."""
+
+from abc import ABC, abstractmethod
+
+from app.modules.media.domain.entities import CMSPage, MediaAsset
+
+
+class IMediaRepository(ABC):
+    @abstractmethod
+    async def get_by_id(self, asset_id: str) -> MediaAsset | None: ...
+    @abstractmethod
+    async def get_by_hash(self, tenant_id: str, content_hash: str) -> MediaAsset | None: ...
+    @abstractmethod
+    async def list_by_tenant(self, tenant_id: str, *, media_type: str | None = None, offset: int = 0, limit: int = 50) -> tuple[list[MediaAsset], int]: ...
+    @abstractmethod
+    async def create(self, asset: MediaAsset) -> MediaAsset: ...
+    @abstractmethod
+    async def update(self, asset: MediaAsset) -> MediaAsset: ...
+    @abstractmethod
+    async def soft_delete(self, asset_id: str) -> None: ...
+
+
+class ICMSPageRepository(ABC):
+    @abstractmethod
+    async def get_by_slug(self, tenant_id: str, slug: str) -> CMSPage | None: ...
+    @abstractmethod
+    async def list_by_tenant(self, tenant_id: str) -> list[CMSPage]: ...
+    @abstractmethod
+    async def upsert(self, page: CMSPage) -> CMSPage: ...

@@ -1,0 +1,275 @@
+# 03 — Jornada do Barbeiro / Profissional
+
+> **Persona:** Marcos, 32 anos · Barbeiro  
+> **Dispositivo:** Smartphone (95%) — usa o celular o dia todo  
+> **Objetivo:** Ver agenda, atender clientes, acompanhar ganhos
+
+---
+
+## 3.1 Funcionalidades Essenciais (MVP)
+
+1. Ver agenda do dia ao abrir
+2. Notificações de novos agendamentos
+3. Histórico do cliente
+4. Marcar check-in / concluído / no-show
+5. Bloquear horários (almoço, folga)
+6. Ver faturamento (dia/semana/mês)
+7. Perfil público com fotos e avaliações
+
+---
+
+## 3.2 Tela Principal: Agenda do Dia
+
+```
+┌────────────────────────────────────┐
+│  📱 BARBEIRO — Quarta, 20 Jul      │
+│  7:30                             │
+│  ┌──────────────────────────────┐ │
+│  │ ☰  Agenda  │ 👤 Marcos  │ 🔔2│ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  ┌──────────────────────────────┐ │
+│  │ 💰 Hoje: R$ 360  │ ⭐ 4.9    │ │
+│  │ 8 agend. │ 80% ocup.         │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  MANHÃ ☀️                         │
+│  ┌──────────────────────────────┐ │
+│  │ ✅ 09:00  João Silva          │ │
+│  │          Corte — R$ 45       │ │
+│  │          "Degradê baixo"      │ │  ← observação do cliente
+│  │          ☑ Check-in  ☑ Feito │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  ┌──────────────────────────────┐ │
+│  │ 🟡 09:30  Pedro Lima          │ │  ← em andamento
+│  │          Barba — R$ 30       │ │
+│  │          [Check-in] [No-show]│ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  ┌──────────────────────────────┐ │
+│  │ ⬜ 10:00  — LIVRE —           │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  ┌──────────────────────────────┐ │
+│  │ 🔵 10:30  Ana Costa           │ │
+│  │          Corte+Barba — R$ 65 │ │
+│  │          "Primeira visita"    │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  INTERVALO 🍽️ (12:00-13:00)      │
+│  ┌──────────────────────────────┐ │
+│  │ 🔒 12:00  — BLOQUEADO —      │ │
+│  │          Almoço               │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  TARDE 🌤️                         │
+│  ┌──────────────────────────────┐ │
+│  │ 🔵 13:00  Rafael Souza        │ │
+│  │          Corte — R$ 45       │ │
+│  └──────────────────────────────┘ │
+│  ...                               │
+│                                    │
+│  ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐  │
+│  │📅 │ │💰 │ │👤 │ │⚙️ │ │📊 │  │
+│  │Age│ │Gan│ │Cli│ │Per│ │Rel│  │
+│  └───┘ └───┘ └───┘ └───┘ └───┘  │
+└────────────────────────────────────┘
+
+Legenda de cores:
+🟢 Verde = Concluído (check-in + atendido)
+🟡 Amarelo = Em andamento (check-in feito, aguardando)
+🔵 Azul = Agendado (confirmado, não chegou)
+⬜ Cinza = Livre
+🔒 Vermelho claro = Bloqueado pelo barbeiro
+```
+
+---
+
+## 3.3 Tela: Ficha do Cliente (ao tocar no agendamento)
+
+```
+┌────────────────────────────────────┐
+│  📱 CLIENTE: João Silva             │
+│                                    │
+│  ┌──────────────────────────────┐ │
+│  │ 👤 João Silva                 │ │
+│  │ 📱 (11) 99999-9999           │ │
+│  │ 📧 joao@email.com            │ │
+│  │ 🏷 Cliente desde Jan/2026    │ │
+│  │ 🔄 12 visitas                │ │
+│  │ ⭐ Avaliação: 4.8            │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  Histórico:                        │
+│  ┌──────────────────────────────┐ │
+│  │ 20/07 — Corte — Marcos       │ │
+│  │ 20/06 — Corte+Barba — Lucas  │ │
+│  │ 20/05 — Corte — Marcos       │ │
+│  │ 20/04 — Corte — Marcos       │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  Preferências:                     │
+│  • Barbeiro favorito: Marcos      │
+│  • Serviço favorito: Corte        │
+│  • Degradê baixo, pomada          │
+│                                    │
+│  Anotações internas:               │
+│  ┌──────────────────────────────┐ │
+│  │ "Gosta de finalizar com      │ │
+│  │  pomada, não usa gel"        │ │
+│  │                 [✏ Editar]   │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  Agendamento atual:                │
+│  Data: 20/07 às 09:00             │
+│  Serviço: Corte — R$ 45           │
+│  Status: ✅ Concluído              │
+│  Pagamento: Sinal PIX R$ 10       │
+│                                    │
+│  ┌──────────────────────────────┐ │
+│  │     [ENVIAR WHATSAPP]        │ │
+│  └──────────────────────────────┘ │
+└────────────────────────────────────┘
+```
+
+---
+
+## 3.4 Tela: Faturamento do Barbeiro
+
+```
+┌────────────────────────────────────┐
+│  📱 MEUS GANHOS                    │
+│                                    │
+│  ┌──────────────────────────────┐ │
+│  │        Julho 2026             │ │
+│  │     ◀         ▶              │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  ┌──────────┐ ┌──────────┐       │
+│  │ 💰 Mês   │ │ 📅 Hoje  │       │
+│  │ R$ 7.200 │ │ R$ 360   │       │
+│  │ 160 cort │ │ 8 cortes │       │
+│  └──────────┘ └──────────┘       │
+│                                    │
+│  Faturamento diário (julho):       │
+│  ████████████████████░░░          │
+│  ██░░░████░░░████████░░░          │
+│  1  5  10  15  20  25  30         │
+│                                    │
+│  Serviços mais realizados:         │
+│  Corte           120x  R$ 5.400   │
+│  Barba            40x  R$ 1.200   │
+│  Corte+Barba      20x  R$ 1.300   │
+│                                    │
+│  Comissão (se configurado):        │
+│  50% dos serviços: R$ 3.600       │
+└────────────────────────────────────┘
+```
+
+---
+
+## 3.5 Tela: Configurações do Barbeiro
+
+```
+┌────────────────────────────────────┐
+│  📱 MEU PERFIL                     │
+│                                    │
+│  ┌──────────────────────────────┐ │
+│  │ ┌────────┐                    │ │
+│  │ │  FOTO  │  Alterar foto     │ │
+│  │ └────────┘                    │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  Nome: Marcos Silva                │
+│  Função: Barbeiro                  │
+│  Bio: Especialista em degradê...   │
+│  Especialidades: Degradê, Tesoura  │
+│                                    │
+│  ─────────────────────────────    │
+│                                    │
+│  Horários especiais:               │
+│  ┌──────────────────────────────┐ │
+│  │ Qua 20/07: Folga (Férias)    │ │
+│  │ Seg-Sex: 09:00-19:00         │ │
+│  │ Almoço: 12:00-13:00          │ │
+│  └──────────────────────────────┘ │
+│  [+ Bloquear dia específico]       │
+│                                    │
+│  ─────────────────────────────    │
+│                                    │
+│  Notificações:                     │
+│  ☑ Novo agendamento (push)        │
+│  ☑ Cancelamento (push)            │
+│  ☑ Lembrete diário (7h)           │
+│  ☐ Relatório semanal (e-mail)     │
+│                                    │
+│  ─────────────────────────────    │
+│                                    │
+│  Meu perfil público:               │
+│  [VER COMO CLIENTE VÊ] →          │
+└────────────────────────────────────┘
+```
+
+---
+
+## 3.6 Notificações e Estados
+
+### Notificação: Novo agendamento
+```
+┌────────────────────────────────────┐
+│  ┌──────────────────────────────┐ │
+│  │ 🔔 NOVO AGENDAMENTO          │ │
+│  │                              │ │
+│  │ João Silva                   │ │
+│  │ Corte — R$ 45                │ │
+│  │ 20/07 — 09:00               │ │
+│  │                              │ │
+│  │ "Degradê baixo"              │ │
+│  │                       [OK]   │ │
+│  └──────────────────────────────┘ │
+└────────────────────────────────────┘
+```
+
+### Estado: Cliente não compareceu (No-show)
+```
+┌────────────────────────────────────┐
+│  ❌ Cliente não compareceu         │
+│                                    │
+│  João Silva — Corte                │
+│  Horário: 09:00 (15 min atraso)    │
+│                                    │
+│  [Enviar WhatsApp]                 │
+│  [Marcar como No-Show]             │
+│  [Reagendar]                       │
+│  [Liberar horário]                 │
+└────────────────────────────────────┘
+```
+
+---
+
+## 3.7 Mobile-First (Barbeiro)
+
+O barbeiro usa **exclusivamente celular**. O layout é otimizado para:
+
+- **Polegar:** Navegação inferior (tab bar) com 5 ícones
+- **Toque:** Áreas de toque ≥ 48px (acessibilidade)
+- **Scroll vertical:** Agenda do dia em lista contínua
+- **Pull-to-refresh:** Atualizar agenda
+- **Swipe:** Arrastar card para esquerda = ações rápidas (check-in, no-show)
+
+---
+
+## 3.8 Emoções do Barbeiro
+
+| Momento | Emoção |
+|---------|--------|
+| Abrir app de manhã | 😌 "Agenda pronta, dia organizado" |
+| Novo agendamento | 📱 "Notificação! Mais um cliente" |
+| Cliente não vem | 😤 "Perdi o horário..." |
+| Ver faturamento | 💪 "Bom mês! Já fiz R$ 7K" |
+| Receber avaliação 5★ | 🥰 "Cliente gostou do corte!" |
+
+---
+
+> **Resumo:** O barbeiro não quer complexidade. Ele quer abrir o app, ver quem vai atender, e tocar o dia. A interface deve ser mínima, rápida, e funcionar 100% no celular. Nada de menu complicado — as 5 coisas que ele mais usa estão na tab bar.

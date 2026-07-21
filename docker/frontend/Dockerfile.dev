@@ -1,0 +1,14 @@
+# Barbershop SaaS — Frontend Dev Dockerfile
+# ============================================================
+# Used only in development (docker-compose.dev.yml).
+# Hot-reload via Vite dev server.
+
+FROM node:22-alpine
+
+RUN corepack enable && corepack prepare pnpm@9 --activate
+
+WORKDIR /app
+
+EXPOSE 5173
+
+CMD ["pnpm", "dev:admin", "--host", "0.0.0.0"]

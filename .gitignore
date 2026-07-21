@@ -1,0 +1,92 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build
+dist/
+build/
+.next/
+.turbo/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.so
+
+# Environment (PRODUCTION credentials — NEVER commit)
+.env.production
+.env.prod
+*.pem
+*.key
+credentials.json
+service-account.json
+
+# Backups
+backups/
+*.sql.gz
+*.dump
+
+# Certificates
+docker/nginx/ssl/
+*.crt
+
+# Docker volumes / local data
+postgres_data/
+redis_data/
+
+# Terraform / IaC
+.terraform/
+*.tfstate*
+
+# OS
+Thumbs.db
+Desktop.ini
+.python-version
+
+# Coverage & Tests
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+
+# Ruff
+.ruff_cache/
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Temp
+tmp/
+temp/

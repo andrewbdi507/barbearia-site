@@ -1,0 +1,19 @@
+# ============================================================
+# Barbershop SaaS — Docker Compose (Entry Point)
+# ============================================================
+# Este arquivo redireciona para o ambiente de desenvolvimento.
+#
+# Ambientes disponíveis:
+#   docker compose -f docker-compose.dev.yml up -d        # Dev
+#   docker compose -f docker-compose.test.yml up -d       # Test
+#   docker compose -f docker-compose.staging.yml up -d    # Staging
+#   docker compose -f docker-compose.prod.yml up -d       # Production
+#
+# Ou use o Makefile:
+#   make up           # Dev stack básica
+#   make up-full      # Dev stack completa
+#   make staging-up   # Staging
+#   make prod-up      # Produção
+
+include:
+  - docker-compose.dev.yml

@@ -1,0 +1,27 @@
+{
+  "name": "barbershop-frontend",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:admin": "pnpm --filter @barbershop/admin dev",
+    "dev:site": "pnpm --filter @barbershop/site dev",
+    "build:admin": "pnpm --filter @barbershop/admin build",
+    "build:site": "pnpm --filter @barbershop/site build",
+    "build:design-system": "pnpm --filter @barbershop/design-system build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "format": "prettier --write \"**/*.{ts,tsx,json,css,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.4.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

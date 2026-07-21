@@ -1,0 +1,1 @@
+"""Media Module — Domain Layer."""

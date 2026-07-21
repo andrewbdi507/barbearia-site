@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:'Inter',system-ui,sans-serif">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:24px 0">
+  <tr>
+    <td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.08)">
+        <tr>
+          <td style="background:#1a1a2e;padding:28px 24px;text-align:center">
+            <h2 style="color:#fff;margin:0;font-size:20px">⏰ Lembrete de Agendamento</h2>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:28px 24px">
+            <p style="margin:0 0 16px;font-size:16px">Olá <strong>{{customer_name}}</strong>,</p>
+            <p style="margin:0 0 24px;color:#666;font-size:15px;line-height:1.6">
+              Seu horário na <strong>{{tenant_name}}</strong> é <strong>amanhã</strong>!
+            </p>
+            <table width="100%" cellpadding="14" cellspacing="0" style="background:#fafafa;border-radius:8px;border:1px solid #e0e0e0">
+              <tr><td style="font-size:15px;font-weight:600;color:#1a1a2e">{{appointment_time}} — {{service_name}}</td></tr>
+              <tr><td style="font-size:14px;color:#666">👤 {{professional_name}} | 💰 {{price_formatted}}</td></tr>
+              <tr><td style="font-size:14px;color:#666">📍 {{tenant_address}}</td></tr>
+            </table>
+            <div style="text-align:center;margin-top:20px">
+              <a href="{{confirmation_url}}" style="display:inline-block;padding:12px 28px;background:#27ae60;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Confirmar Presença</a>
+              <a href="{{cancel_url}}" style="display:inline-block;padding:12px 20px;margin-left:8px;color:#999;text-decoration:none;font-size:14px">Cancelar</a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>

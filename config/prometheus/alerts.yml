@@ -1,0 +1,156 @@
+# ============================================================
+# Prometheus Alert Rules — Barbershop SaaS
+# ============================================================
+
+groups:
+  - name: barbershop_critical
+    rules:
+      # ---- API Availability ----
+      - alert: APIDown
+        expr: up{job="backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Backend API is DOWN"
+          description: "Backend instance {{ $labels.instance }} has been down for more than 1 minute."
+          runbook: "https://docs.barbershop.com/runbook#api-down"
+
+      # ---- Database Unavailable ----
+      - alert: DatabaseDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "PostgreSQL is DOWN"
+          description: "Database is unreachable."
+          runbook: "https://docs.barbershop.com/runbook#database-down"
+
+      # ---- Redis Unavailable ----
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Redis is DOWN"
+          description: "Redis cache is unreachable."
+          runbook: "https://docs.barbershop.com/runbook#redis-down"
+
+      # ---- High Error Rate ----
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "High 5xx error rate (> 5%)"
+          description: "API error rate is {{ $value | humanizePercentage }} on {{ $labels.instance }}."
+          runbook: "https://docs.barbearia.com/runbook#high-error-rate"
+
+      # ---- Worker Queue Stalled ----
+      - alert: WorkerQueueStalled
+        expr: rate(worker_jobs_processed_total[10m]) == 0 and worker_queue_size > 10
+        for: 10m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "Worker queue is stalled"
+          description: "Queue has {{ $value }} pending jobs but no processing detected."
+
+  - name: barbershop_warning
+    rules:
+      # ---- High CPU Usage ----
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total{job="backend"}[5m]) * 100 > 80
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High CPU usage (> 80%)"
+          description: "Backend CPU at {{ $value | humanize }}% on {{ $labels.instance }}."
+
+      # ---- High Memory Usage ----
+      - alert: HighMemoryUsage
+        expr: process_resident_memory_bytes{job="backend"} / 1024 / 1024 / 1024 > 1.5
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High memory usage (> 1.5 GB)"
+          description: "Backend memory: {{ $value | humanize }}GB on {{ $labels.instance }}."
+
+      # ---- Disk Space Low ----
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.20
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Disk space below 20%"
+          description: "Available disk: {{ $value | humanizePercentage }}."
+
+      # ---- High Response Latency ----
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 10m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High P95 latency (> 2s)"
+          description: "P95 latency is {{ $value }}s on {{ $labels.instance }}."
+
+      # ---- High No-Show Rate ----
+      - alert: HighNoShowRate
+        expr: rate(bookings_no_show_total[1h]) / rate(bookings_completed_total[1h]) > 0.3
+        for: 30m
+        labels:
+          severity: warning
+          team: business
+        annotations:
+          summary: "High no-show rate (> 30%)"
+          description: "No-show rate at {{ $value | humanizePercentage }}."
+
+      # ---- Backup Failure ----
+      - alert: BackupFailed
+        expr: backup_last_success_timestamp < (time() - 86400)
+        for: 1h
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "Backup hasn't run in 24 hours"
+          description: "Last successful backup was more than 24 hours ago."
+
+      # ---- SSL Certificate Expiring ----
+      - alert: SSLCertExpiring
+        expr: probe_ssl_earliest_cert_expiry - time() < 86400 * 14
+        for: 1h
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "SSL certificate expiring in < 14 days"
+          description: "Certificate expires in {{ $value | humanizeDuration }}."
+
+  - name: barbershop_info
+    rules:
+      # ---- Deployment Events ----
+      - alert: DeploymentNotification
+        expr: changes(deploy_timestamp_seconds[5m]) > 0
+        labels:
+          severity: info
+          team: platform
+        annotations:
+          summary: "New deployment detected"
+          description: "A new version was deployed to {{ $labels.environment }}."

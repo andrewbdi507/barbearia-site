@@ -1,0 +1,11 @@
+# ============================================================
+# Barbershop SaaS — .dockerignore (Frontend)
+# ============================================================
+node_modules/
+dist/
+.git/
+.vscode/
+.idea/
+*.md
+.env*
+.DS_Store
