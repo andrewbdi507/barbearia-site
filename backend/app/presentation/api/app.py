@@ -53,9 +53,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     )
 
     # ---- Middleware ----
+    _cors = settings.security.cors_origins
+    # Garantir que as origins de produção estão sempre presentes
+    _cors_extra = [
+        "https://agendaos-frontend.onrender.com",
+        "https://agendaos-site.onrender.com",
+    ]
+    for o in _cors_extra:
+        if o not in _cors:
+            _cors.append(o)
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.security.cors_origins,
+        allow_origins=_cors,
         allow_credentials=True,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["*"],
