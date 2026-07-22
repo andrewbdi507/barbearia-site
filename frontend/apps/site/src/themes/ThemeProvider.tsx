@@ -84,10 +84,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       } catch {
         // CORS / timeout / offline → use fallback silently
       }
-        }
-      } catch {
-        // API offline — fallback to localStorage
-      }
 
       // Fallback: localStorage
       const saved = localStorage.getItem("barbershop_site_theme");
