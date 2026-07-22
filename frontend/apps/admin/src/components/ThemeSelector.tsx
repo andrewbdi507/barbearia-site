@@ -68,6 +68,10 @@ export function ThemeSelector() {
   }, []);
 
   useEffect(() => {
+    // Auto-enable demo full access for MVP
+    if (localStorage.getItem("demo_full_access") === null) {
+      localStorage.setItem("demo_full_access", "1");
+    }
     fetchAllowedThemes();
   }, [fetchAllowedThemes]);
 
