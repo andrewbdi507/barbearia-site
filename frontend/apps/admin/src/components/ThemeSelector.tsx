@@ -35,16 +35,34 @@ export function ThemeSelector() {
       const planId = tenant.plan_id;
 
       if (!planId) {
-        setAllowedThemes(["minimal"]);
+        // Check demo flag
+        if (localStorage.getItem("demo_full_access") === "1") {
+          setAllowedThemes(themes.map((t) => THEME_SLUG_MAP[t.id] || t.id));
+        } else {
+          setAllowedThemes(["minimal"]);
+        }
         return;
       }
 
       const plan = await planAPI.get(planId);
-      setAllowedThemes(plan.themes?.length ? plan.themes : ["minimal"]);
+      // Enterprise tier or full-access flag → unlock all themes
+      const isEnterprise = plan.tier === "enterprise" || plan.slug === "enterprise";
+      const hasFullAccess = localStorage.getItem("demo_full_access") === "1";
+
+      if (isEnterprise || hasFullAccess) {
+        localStorage.setItem("demo_full_access", "1");
+        setAllowedThemes(themes.map((t) => THEME_SLUG_MAP[t.id] || t.id));
+      } else {
+        setAllowedThemes(plan.themes?.length ? plan.themes : ["minimal"]);
+      }
     } catch {
-      setError("Erro ao carregar temas disponíveis.");
-      setAllowedThemes(["minimal"]);
-    } finally {
+      // If demo_full_access flag is set, unlock all themes even on API failure
+      if (localStorage.getItem("demo_full_access") === "1") {
+        setAllowedThemes(themes.map((t) => THEME_SLUG_MAP[t.id] || t.id));
+      } else {
+        setError("Erro ao carregar temas disponíveis.");
+        setAllowedThemes(["minimal"]);
+      } finally {
       setLoading(false);
     }
   }, []);
