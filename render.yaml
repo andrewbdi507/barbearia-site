@@ -6,15 +6,17 @@
 # ============================================================
 
 services:
-  # ---- Backend API (Web Service - Docker) ----
+  # ---- Backend API (Web Service - Python Nativo) ----
   - type: web
     name: agendaos-backend
     region: oregon
     plan: free
-    runtime: docker
+    runtime: python
     repo: https://github.com/andrewbd507/barbearia-site
     branch: main
-    dockerfilePath: ./Dockerfile
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     numInstances: 1
     envVars:
