@@ -68,6 +68,9 @@ def _plan_to_entity(m: PlanModel) -> Plan:
         price_yearly=m.price_yearly,
         limits=PlanLimits.from_dict(m.limits or {}),
         features=m.features or [],
+        themes=m.themes or [],
+        ai_tokens=m.ai_tokens,
+        max_concurrent_users=m.max_concurrent_users,
         is_active=m.is_active,
         is_public=m.is_public,
         sort_order=m.sort_order,
@@ -488,6 +491,9 @@ class PlanRepository(IPlanRepository):
             price_yearly=plan.price_yearly,
             limits=plan.limits.to_dict(),
             features=plan.features,
+            themes=plan.themes,
+            ai_tokens=plan.ai_tokens,
+            max_concurrent_users=plan.max_concurrent_users,
             is_active=plan.is_active,
             is_public=plan.is_public,
             sort_order=plan.sort_order,
@@ -508,6 +514,9 @@ class PlanRepository(IPlanRepository):
         model.price_yearly = plan.price_yearly
         model.limits = plan.limits.to_dict()
         model.features = plan.features
+        model.themes = plan.themes
+        model.ai_tokens = plan.ai_tokens
+        model.max_concurrent_users = plan.max_concurrent_users
         model.is_active = plan.is_active
         model.is_public = plan.is_public
         model.sort_order = plan.sort_order

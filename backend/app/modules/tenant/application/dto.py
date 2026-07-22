@@ -49,9 +49,30 @@ class PlanCreateRequest(BaseModel):
     price_yearly: int = Field(default=0, ge=0)
     limits: PlanLimitsDTO = Field(default_factory=PlanLimitsDTO)
     features: list[str] = Field(default_factory=list)
+    themes: list[str] = Field(default_factory=list, description="Slugs de temas permitidos")
+    ai_tokens: int | None = Field(default=None, ge=0, description="Limite mensal de tokens IA (null=ilimitado)")
+    max_concurrent_users: int | None = Field(default=None, ge=0, description="Max usuários simultâneos (null=ilimitado)")
     is_active: bool = True
     is_public: bool = True
     sort_order: int = 0
+
+
+class PlanUpdateRequest(BaseModel):
+    """Request para atualizar plano — campos opcionais."""
+    name: str | None = Field(default=None, min_length=2, max_length=100)
+    slug: str | None = Field(default=None, min_length=2, max_length=50, pattern=r"^[a-z0-9-]+$")
+    tier: str | None = Field(default=None, pattern=r"^(starter|pro|premium|enterprise)$")
+    description: str | None = None
+    price_monthly: int | None = Field(default=None, ge=0)
+    price_yearly: int | None = Field(default=None, ge=0)
+    limits: PlanLimitsDTO | None = None
+    features: list[str] | None = None
+    themes: list[str] | None = None
+    ai_tokens: int | None = Field(default=None, ge=0)
+    max_concurrent_users: int | None = Field(default=None, ge=0)
+    is_active: bool | None = None
+    is_public: bool | None = None
+    sort_order: int | None = None
 
 
 class PlanResponse(BaseModel):
@@ -65,6 +86,9 @@ class PlanResponse(BaseModel):
     price_yearly: int
     limits: dict[str, Any]
     features: list[str]
+    themes: list[str] = []
+    ai_tokens: int | None = None
+    max_concurrent_users: int | None = None
     is_active: bool
     is_public: bool
     sort_order: int
@@ -73,6 +97,24 @@ class PlanResponse(BaseModel):
 class PlanListResponse(BaseModel):
     """Lista de planos."""
     plans: list[PlanResponse]
+
+
+class PlanUsageResponse(BaseModel):
+    """Uso mensal dos recursos do plano."""
+    tenant_id: str
+    month: str
+    bookings_count: int
+    ai_tokens_used: int
+    limits: dict[str, Any] = {}
+
+
+class CheckLimitResponse(BaseModel):
+    """Resultado da verificação de limite."""
+    resource: str
+    current: int
+    max_allowed: int
+    remaining: int
+    exceeded: bool
 
 
 # ============================================================

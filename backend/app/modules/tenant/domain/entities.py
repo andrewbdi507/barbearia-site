@@ -36,6 +36,9 @@ class Plan:
     price_yearly: int = 0  # centavos (BRL)
     limits: PlanLimits = field(default_factory=PlanLimits)
     features: list[str] = field(default_factory=list)
+    themes: list[str] = field(default_factory=list)
+    ai_tokens: int | None = None  # null = unlimited
+    max_concurrent_users: int | None = None
     is_active: bool = True
     is_public: bool = True  # visível na página de pricing
     sort_order: int = 0

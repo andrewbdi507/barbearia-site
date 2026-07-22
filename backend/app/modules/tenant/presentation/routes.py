@@ -27,6 +27,9 @@ from app.modules.tenant.application.dto import (
     PlanCreateRequest,
     PlanListResponse,
     PlanResponse,
+    PlanUpdateRequest,
+    PlanUsageResponse,
+    CheckLimitResponse,
     SocialMediaBatchRequest,
     SocialMediaResponse,
     SubscriptionListResponse,
@@ -311,9 +314,44 @@ async def get_subscription_history(
 async def list_plans(
     session: AsyncSession = Depends(get_async_session),
 ) -> PlanListResponse:
+    """Lista planos ativos e públicos (página de pricing)."""
     repo = PlanRepository(session)
     plans = await repo.list_active()
-    return PlanListResponse(plans=[PlanResponse(**p.__dict__) for p in plans])
+    return PlanListResponse(plans=[
+        PlanResponse(
+            id=p.id, name=p.name, slug=p.slug, tier=p.tier,
+            description=p.description, price_monthly=p.price_monthly,
+            price_yearly=p.price_yearly, limits=p.limits.to_dict(),
+            features=p.features,
+            themes=getattr(p, 'themes', []),
+            ai_tokens=getattr(p, 'ai_tokens', None),
+            max_concurrent_users=getattr(p, 'max_concurrent_users', None),
+            is_active=p.is_active, is_public=p.is_public, sort_order=p.sort_order,
+        )
+        for p in plans
+    ])
+
+
+@plan_router.get("/all", response_model=PlanListResponse)
+async def list_all_plans(
+    session: AsyncSession = Depends(get_async_session),
+) -> PlanListResponse:
+    """Lista TODOS os planos (super admin)."""
+    repo = PlanRepository(session)
+    plans = await repo.list_all()
+    return PlanListResponse(plans=[
+        PlanResponse(
+            id=p.id, name=p.name, slug=p.slug, tier=p.tier,
+            description=p.description, price_monthly=p.price_monthly,
+            price_yearly=p.price_yearly, limits=p.limits.to_dict(),
+            features=p.features,
+            themes=getattr(p, 'themes', []),
+            ai_tokens=getattr(p, 'ai_tokens', None),
+            max_concurrent_users=getattr(p, 'max_concurrent_users', None),
+            is_active=p.is_active, is_public=p.is_public, sort_order=p.sort_order,
+        )
+        for p in plans
+    ])
 
 
 @plan_router.get("/{plan_id}", response_model=PlanResponse)
@@ -321,12 +359,22 @@ async def get_plan(
     plan_id: str,
     session: AsyncSession = Depends(get_async_session),
 ) -> PlanResponse:
+    """Retorna detalhes de um plano específico."""
     repo = PlanRepository(session)
     plan = await repo.get_by_id(plan_id)
     if plan is None:
         from app.core.exceptions import NotFoundError
         raise NotFoundError(message="Plano não encontrado.")
-    return PlanResponse(**plan.__dict__)
+    return PlanResponse(
+        id=plan.id, name=plan.name, slug=plan.slug, tier=plan.tier,
+        description=plan.description, price_monthly=plan.price_monthly,
+        price_yearly=plan.price_yearly, limits=plan.limits.to_dict(),
+        features=plan.features,
+        themes=getattr(plan, 'themes', []),
+        ai_tokens=getattr(plan, 'ai_tokens', None),
+        max_concurrent_users=getattr(plan, 'max_concurrent_users', None),
+        is_active=plan.is_active, is_public=plan.is_public, sort_order=plan.sort_order,
+    )
 
 
 @plan_router.post("", response_model=PlanResponse, status_code=201)
@@ -334,9 +382,9 @@ async def create_plan(
     body: PlanCreateRequest,
     session: AsyncSession = Depends(get_async_session),
 ) -> PlanResponse:
+    """Cria um novo plano (super admin)."""
     from app.modules.tenant.application.plan_service import PlanService
     from app.modules.tenant.infrastructure.cache import TenantRedisCache
-    # PlanService sem cache para MVP
     cache = TenantRedisCache(None)  # type: ignore
     service = PlanService(
         plan_repo=PlanRepository(session),
@@ -345,7 +393,114 @@ async def create_plan(
         cache=cache,
     )
     plan = await service.create_plan(**body.model_dump(exclude_none=True))
-    return PlanResponse(**plan.__dict__)
+    return PlanResponse(
+        id=plan.id, name=plan.name, slug=plan.slug, tier=plan.tier,
+        description=plan.description, price_monthly=plan.price_monthly,
+        price_yearly=plan.price_yearly, limits=plan.limits.to_dict(),
+        features=plan.features,
+        themes=getattr(plan, 'themes', []),
+        ai_tokens=getattr(plan, 'ai_tokens', None),
+        max_concurrent_users=getattr(plan, 'max_concurrent_users', None),
+        is_active=plan.is_active, is_public=plan.is_public, sort_order=plan.sort_order,
+    )
+
+
+@plan_router.patch("/{plan_id}", response_model=PlanResponse)
+async def update_plan(
+    plan_id: str,
+    body: PlanUpdateRequest,
+    session: AsyncSession = Depends(get_async_session),
+) -> PlanResponse:
+    """Atualiza um plano existente (super admin)."""
+    from app.modules.tenant.application.plan_service import PlanService
+    from app.modules.tenant.infrastructure.cache import TenantRedisCache
+    cache = TenantRedisCache(None)  # type: ignore
+    service = PlanService(
+        plan_repo=PlanRepository(session),
+        sub_repo=SubscriptionRepository(session),
+        tenant_repo=TenantRepository(session),
+        cache=cache,
+    )
+    plan = await service.update_plan(plan_id, **body.model_dump(exclude_none=True))
+    return PlanResponse(
+        id=plan.id, name=plan.name, slug=plan.slug, tier=plan.tier,
+        description=plan.description, price_monthly=plan.price_monthly,
+        price_yearly=plan.price_yearly, limits=plan.limits.to_dict(),
+        features=plan.features,
+        themes=getattr(plan, 'themes', []),
+        ai_tokens=getattr(plan, 'ai_tokens', None),
+        max_concurrent_users=getattr(plan, 'max_concurrent_users', None),
+        is_active=plan.is_active, is_public=plan.is_public, sort_order=plan.sort_order,
+    )
+
+
+@plan_router.get("/{plan_id}/usage", response_model=PlanUsageResponse)
+async def get_plan_usage(
+    plan_id: str,
+    tenant: dict = Depends(get_current_tenant),
+    session: AsyncSession = Depends(get_async_session),
+) -> PlanUsageResponse:
+    """Retorna uso atual do plano para o mês corrente."""
+    from datetime import datetime, timezone
+    from sqlalchemy import select
+    from app.modules.tenant.infrastructure.models.tenant_models import PlanUsageModel, PlanModel
+
+    now = datetime.now(timezone.utc)
+    month = now.strftime("%Y-%m")
+
+    # Buscar ou criar registro de uso
+    result = await session.execute(
+        select(PlanUsageModel).where(
+            PlanUsageModel.tenant_id == tenant["id"],
+            PlanUsageModel.month == month,
+        )
+    )
+    usage = result.scalar_one_or_none()
+
+    if usage is None:
+        usage = PlanUsageModel(
+            tenant_id=tenant["id"],
+            month=month,
+            bookings_count=0,
+            ai_tokens_used=0,
+        )
+        session.add(usage)
+        await session.flush()
+
+    # Buscar limites do plano
+    plan_result = await session.execute(
+        select(PlanModel.limits, PlanModel.ai_tokens).where(PlanModel.id == plan_id)
+    )
+    plan_row = plan_result.one_or_none()
+    limits = plan_row[0] if plan_row else {}
+    ai_token_limit = plan_row[1] if plan_row else None
+
+    return PlanUsageResponse(
+        tenant_id=tenant["id"],
+        month=month,
+        bookings_count=usage.bookings_count,
+        ai_tokens_used=usage.ai_tokens_used,
+        limits={
+            **limits,
+            "ai_tokens": ai_token_limit,
+        },
+    )
+
+
+@plan_router.get("/{plan_id}/check-limit/{resource}", response_model=CheckLimitResponse)
+async def check_plan_limit(
+    plan_id: str,
+    resource: str,
+    tenant: dict = Depends(get_current_tenant),
+    session: AsyncSession = Depends(get_async_session),
+) -> CheckLimitResponse:
+    """Verifica se um recurso está dentro do limite do plano."""
+    from app.modules.tenant.presentation.plan_guard import check_resource_limit
+
+    plan_info = await check_resource_limit(
+        session, tenant["id"], plan_id, resource,
+    )
+    return CheckLimitResponse(**plan_info)
 
 
 # ============================================================
