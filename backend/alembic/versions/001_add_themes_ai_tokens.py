@@ -44,8 +44,15 @@ def upgrade() -> None:
         sa.Column("max_concurrent_users", sa.Integer(), nullable=True),
     )
 
+    # Add theme column to tenant_branding (String, nullable)
+    op.add_column(
+        "tenant_branding",
+        sa.Column("theme", sa.String(30), nullable=True),
+    )
+
 
 def downgrade() -> None:
+    op.drop_column("tenant_branding", "theme")
     op.drop_column("plans", "max_concurrent_users")
     op.drop_column("plans", "ai_tokens")
     op.drop_column("plans", "themes")
