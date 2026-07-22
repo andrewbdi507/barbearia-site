@@ -6,7 +6,7 @@ import {
   DollarSign, BarChart3, Settings, Palette, LogOut,
   Menu, X, Bell, Sun, Moon, ChevronDown, Search,
   Command, Home, Image, Star, MessageSquare, Globe, HelpCircle,
-  ChevronRight, Brain,
+  ChevronRight, Brain, Zap,
 } from "lucide-react";
 
 const navItems = [
@@ -22,6 +22,7 @@ const navItems = [
   { to: "/site", icon: Globe, label: "Site" },
   { to: "/notifications", icon: MessageSquare, label: "Notificações" },
   { to: "/agents", icon: Brain, label: "IA & Agentes" },
+  { to: "/plans", icon: Zap, label: "Planos" },
 ];
 
 const bottomNavItems = [

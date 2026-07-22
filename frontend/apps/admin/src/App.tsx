@@ -11,6 +11,7 @@ import { ReportsPage } from "./pages/ReportsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { ThemeConfigPage } from "./pages/ThemeConfigPage";
 import AgentsPage from "./pages/AgentsPage";
+import PlansPage from "./pages/PlansPage";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const token = sessionStorage.getItem("access_token");
@@ -40,6 +41,7 @@ export default function App() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/settings/theme" element={<ThemeConfigPage />} />
         <Route path="/agents" element={<AgentsPage />} />
+        <Route path="/plans" element={<PlansPage />} />
       </Route>
     </Routes>
   );
