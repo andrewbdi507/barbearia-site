@@ -110,4 +110,19 @@ PYTHONPATH=/app alembic -c /app/alembic/alembic.ini stamp head 2>/dev/null && \
 echo ""
 echo "[3/3] STARTING SERVER on :${PORT:-8000}"
 exec uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port "${PORT:-8000}"
+PYEOF
+
+DATABASE_URL="$DATABASE_URL" python3 /tmp/create_tables.py
+
+# ---- 2. ALEMBIC STAMP ----
+echo ""
+echo "[2/3] ALEMBIC STAMP"
+PYTHONPATH=/app alembic -c /app/alembic/alembic.ini stamp head 2>/dev/null && \
+  echo "  Alembic stamped OK" || \
+  echo "  Alembic skipped (no migrations yet)"
+
+# ---- 3. START SERVER ----
+echo ""
+echo "[3/3] STARTING SERVER on :${PORT:-8000}"
+exec uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port "${PORT:-8000}"
 exec uvicorn app.presentation.api.app:create_app --factory --host 0.0.0.0 --port "${PORT:-8000}"
