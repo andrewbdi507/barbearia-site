@@ -79,6 +79,21 @@ with engine.connect() as conn:
     else:
         print(f"  Plans already exist: {existing}")
 
+    # ---- Ensure demo tenant has Enterprise plan (full access) ----
+    enterprise_id = conn.execute(
+        text("SELECT id FROM plans WHERE slug = 'enterprise' LIMIT 1")
+    ).scalar()
+    if enterprise_id:
+        # Update ALL existing tenants to enterprise for MVP/demo
+        updated = conn.execute(
+            text("UPDATE tenants SET plan_id = :pid WHERE plan_id != :pid OR plan_id IS NULL"),
+            {"pid": enterprise_id},
+        ).rowcount
+        conn.commit()
+        if updated:
+            print(f"  Demo tenants upgraded to Enterprise: {updated}")
+    # ----------------------------------------------------------------
+
 engine.dispose()
 PYEOF
 
