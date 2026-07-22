@@ -40,6 +40,8 @@ services:
         value: agendaos
       - key: SECRET_KEY
         generateValue: true
+      - key: PORT
+        value: "10000"
       - key: JWT_ALGORITHM
         value: HS256
       - key: JWT_EXPIRES_IN
@@ -82,26 +84,32 @@ services:
       - key: AGENT_TIMEOUT
         value: "30"
 
-  # ---- Frontend (Static Site) ----
-  - type: web
+  # ---- Admin Frontend (Static Site) ----
+  - type: static
     name: agendaos-frontend
-    region: oregon
-    plan: free
-    runtime: static
     repo: https://github.com/andrewbdi507/barbearia-site
     branch: main
-    buildCommand: cd frontend && npm install -g pnpm && pnpm install --no-frozen-lockfile && cd apps/admin && pnpm build
-    staticPublishPath: ./frontend/apps/admin/dist
-    pullRequestPreviewsEnabled: false
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    rootDir: frontend
+    buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && cd apps/admin && pnpm build
+    publishPath: apps/admin/dist
     envVars:
       - key: VITE_API_URL
         fromService:
           name: agendaos-backend
           type: web
           property: url
-      - key: VITE_APP_ENV
-        value: production
+
+  # ---- Site Público (Static Site) ----
+  - type: static
+    name: agendaos-site
+    repo: https://github.com/andrewbdi507/barbearia-site
+    branch: main
+    rootDir: frontend
+    buildCommand: npm install -g pnpm && pnpm install --no-frozen-lockfile && cd apps/site && pnpm build
+    publishPath: apps/site/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: agendaos-backend
+          type: web
+          property: url
