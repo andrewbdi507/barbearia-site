@@ -52,64 +52,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=_create_lifespan(settings),
     )
 
-    # ---- RAW CORS (pure ASGI — FIRST, before CORSMiddleware) ----
-    from starlette.types import ASGIApp, Scope, Receive, Send
-    from starlette.responses import Response
-
-    class PureCorsMiddleware:
-        def __init__(self, app: ASGIApp) -> None:
-            self.app = app
-
-        async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-            if scope["type"] != "http":
-                await self.app(scope, receive, send)
-                return
-
-            # Handle OPTIONS preflight immediately
-            if scope["method"] == "OPTIONS":
-                headers = [
-                    (b"access-control-allow-origin", b"*"),
-                    (b"access-control-allow-credentials", b"true"),
-                    (b"access-control-allow-methods", b"GET,POST,PUT,PATCH,DELETE,OPTIONS"),
-                    (b"access-control-allow-headers", b"*"),
-                    (b"access-control-max-age", b"86400"),
-                ]
-                async def send_options(message):
-                    if message["type"] == "http.response.start":
-                        message["headers"] = headers + list(message.get("headers", []))
-                        message["status"] = 200
-                    await send(message)
-                await self.app(scope, receive, send_options)
-                return
-
-            # For all other requests, inject CORS headers into response
-            async def cors_send(message):
-                if message["type"] == "http.response.start":
-                    headers = dict(message.get("headers", []))
-                    origin = b"*"
-                    for h in scope.get("headers", []):
-                        if h[0] == b"origin":
-                            origin = h[1]
-                            break
-                    headers[b"access-control-allow-origin"] = origin
-                    headers[b"access-control-allow-credentials"] = b"true"
-                    headers[b"access-control-allow-methods"] = b"GET,POST,PUT,PATCH,DELETE,OPTIONS"
-                    headers[b"access-control-allow-headers"] = b"*"
-                    message["headers"] = list(headers.items())
-                await send(message)
-
-            await self.app(scope, receive, cors_send)
-
-    app.add_middleware(PureCorsMiddleware)
-
-    # ---- Middleware ----
+    # ---- CORS ----
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["*"],
         allow_credentials=True,
-        allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allow_methods=["*"],
         allow_headers=["*"],
-        expose_headers=["X-Request-ID"],
     )
 
     # ---- Exception Handlers ----
