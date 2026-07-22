@@ -47,6 +47,10 @@ RUN pip install --no-cache-dir \
     orjson \
     uuid7
 
+# ---- Cache-bust: forces fresh COPY on every deploy ----
+ARG CACHEBUST=1
+RUN echo "Cache bust: ${CACHEBUST}"
+
 # Copy backend source
 COPY backend/ .
 
