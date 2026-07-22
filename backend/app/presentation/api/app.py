@@ -164,9 +164,6 @@ def _mount_all_routers(app: FastAPI) -> None:
     from app.modules.scheduling.presentation.deposit_routes import deposit_router
     app.include_router(scheduling_router, prefix=prefix)
     app.include_router(deposit_router, prefix=f"{prefix}/scheduling")
-    from app.modules.scheduling.presentation.deposit_routes import deposit_router
-    app.include_router(scheduling_router, prefix=prefix)
-    app.include_router(deposit_router, prefix=f"{prefix}/scheduling")
 
     # Customer / CRM
     from app.modules.customer.presentation.routes import router as customer_router

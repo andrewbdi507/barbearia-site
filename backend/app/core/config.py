@@ -56,9 +56,12 @@ class DatabaseSettings(BaseSettings):
 
     @property
     def dsn(self) -> str:
-        """Async DSN (postgresql+asyncpg://)."""
+        """Async DSN (postgresql+asyncpg://). Inclui SSL para Render."""
         host, user, port, pw, db = self._parsed
-        return f"postgresql+asyncpg://{user}:{pw}@{host}:{port}/{db}"
+        base = f"postgresql+asyncpg://{user}:{pw}@{host}:{port}/{db}"
+        if "render.com" in host:
+            base += "?ssl=require"
+        return base
 
     @property
     def sync_dsn(self) -> str:
