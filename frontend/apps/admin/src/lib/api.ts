@@ -85,3 +85,67 @@ export const agentsAPI = {
   claudeMemRetrieve: (userId: string, query?: string) => request(`${API}/agents/claude-mem/retrieve`, { method: "POST", body: JSON.stringify({ user_id: userId, query }) }),
   runWorkflow: (workflow: { name: string; steps: Record<string, unknown>[] }) => request(`${API}/agents/workflow`, { method: "POST", body: JSON.stringify(workflow) }),
 };
+
+// ---- Plans & Billing ----
+
+export interface PlanDTO {
+  id: string;
+  name: string;
+  slug: string;
+  tier: string;
+  description: string | null;
+  price_monthly: number;
+  price_yearly: number;
+  limits: Record<string, unknown>;
+  features: string[];
+  themes: string[];
+  ai_tokens: number | null;
+  max_concurrent_users: number | null;
+  is_active: boolean;
+  is_public: boolean;
+  sort_order: number;
+}
+
+export interface PlanUsageDTO {
+  tenant_id: string;
+  month: string;
+  bookings_count: number;
+  ai_tokens_used: number;
+  limits: Record<string, unknown>;
+}
+
+export interface CheckLimitDTO {
+  resource: string;
+  current: number;
+  max_allowed: number;
+  remaining: number;
+  exceeded: boolean;
+}
+
+export interface TenantMeDTO {
+  id: string;
+  subdomain: string;
+  name: string;
+  slug: string;
+  status: string;
+  plan_id: string | null;
+  owner_id: string | null;
+  trial_ends_at: string | null;
+  settings: Record<string, unknown> | null;
+  branding: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export const planAPI = {
+  list: () => request<{ plans: PlanDTO[] }>(`${API}/plans`),
+  listAll: () => request<{ plans: PlanDTO[] }>(`${API}/plans/all`),
+  get: (id: string) => request<PlanDTO>(`${API}/plans/${id}`),
+  getUsage: (id: string) => request<PlanUsageDTO>(`${API}/plans/${id}/usage`),
+  checkLimit: (id: string, resource: string) => request<CheckLimitDTO>(`${API}/plans/${id}/check-limit/${resource}`),
+};
+
+export const tenantAPI = {
+  me: () => request<TenantMeDTO>(`${API}/tenants/me`),
+  updateMe: (data: Record<string, unknown>) => request<TenantMeDTO>(`${API}/tenants/me`, { method: "PATCH", body: JSON.stringify(data) }),
+  getSubscription: () => request<{ id: string; plan_id: string; status: string; trial_ends_at: string | null }>(`${API}/tenants/me/subscription`),
+};
