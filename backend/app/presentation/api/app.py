@@ -66,7 +66,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                     "access-control-allow-headers": "*",
                     "access-control-max-age": "86400",
                 })
-            response = await call_next(request)
+            try:
+                response = await call_next(request)
+            except Exception:
+                from starlette.responses import JSONResponse as JR
+                from traceback import format_exc
+                response = JR(
+                    status_code=500,
+                    content={"error": "internal_error", "message": "Erro interno.", "detail": format_exc()[:500]},
+                )
             response.headers["access-control-allow-origin"] = request.headers.get("origin", "*")
             response.headers["access-control-allow-credentials"] = "true"
             response.headers["access-control-allow-methods"] = "GET,POST,PUT,PATCH,DELETE,OPTIONS"
