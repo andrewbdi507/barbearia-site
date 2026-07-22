@@ -52,19 +52,28 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=_create_lifespan(settings),
     )
 
-    # ---- CORS ----
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[
-            "https://agendaos-frontend.onrender.com",
-            "https://agendaos-site.onrender.com",
-            "http://localhost:5173",
-            "http://localhost:5174",
-        ],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+    # ---- CORS (hardcoded — CORSMiddleware bug on Python 3.14) ----
+    from starlette.middleware.base import BaseHTTPMiddleware
+
+    class CORSFixMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request, call_next):
+            if request.method == "OPTIONS":
+                from starlette.responses import Response
+                return Response(status_code=200, headers={
+                    "access-control-allow-origin": request.headers.get("origin", "*"),
+                    "access-control-allow-credentials": "true",
+                    "access-control-allow-methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+                    "access-control-allow-headers": "*",
+                    "access-control-max-age": "86400",
+                })
+            response = await call_next(request)
+            response.headers["access-control-allow-origin"] = request.headers.get("origin", "*")
+            response.headers["access-control-allow-credentials"] = "true"
+            response.headers["access-control-allow-methods"] = "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+            response.headers["access-control-allow-headers"] = "*"
+            return response
+
+    app.add_middleware(CORSFixMiddleware)
 
     # ---- Exception Handlers ----
     _register_exception_handlers(app)
