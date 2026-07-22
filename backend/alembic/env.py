@@ -36,9 +36,9 @@ import app.modules.site.infrastructure.models.site_models  # noqa: F401
 # Alembic Config object
 config = context.config
 
-# Set the SQLAlchemy URL from our settings
+# Set the SQLAlchemy URL from our settings (async DSN for async engine)
 settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.db.sync_dsn)
+config.set_main_option("sqlalchemy.url", settings.db.dsn)
 
 # Setup loggers
 if config.config_file_name is not None:
@@ -80,6 +80,7 @@ async def run_async_migrations() -> None:
         configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
+        connect_args={"ssl": True},
     )
 
     async with connectable.connect() as connection:
