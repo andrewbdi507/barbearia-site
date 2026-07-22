@@ -51,20 +51,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     let cancelled = false;
 
     async function load() {
+      // Try API with 4s timeout (CORS failure won't hang)
       try {
-        // Extract subdomain from hostname
         const host = window.location.hostname;
         const parts = host.split(".");
         const subdomain = parts.length > 2 ? parts[0] : null;
-
-        // Try API first: GET /api/v1/site?subdomain={subdomain}
         const apiBase = (import.meta as Record<string, unknown>).env
           ? (import.meta as unknown as { env: Record<string, string> }).env.VITE_API_URL || ""
           : "";
+
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 4000);
+
         const resp = await fetch(
           `${apiBase}/api/v1/site?subdomain=${subdomain || "demo"}`,
-          { headers: { "Content-Type": "application/json" } }
+          { signal: controller.signal, headers: { "Content-Type": "application/json" } }
         );
+        clearTimeout(timer);
 
         if (resp.ok) {
           const data = await resp.json();
@@ -75,9 +78,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             setThemeId(apiTheme);
             localStorage.setItem("barbershop_site_theme", apiTheme);
             applyFullTheme(apiTheme);
-            setIsLoading(false);
-            return;
+            return; // skip fallback
           }
+        }
+      } catch {
+        // CORS / timeout / offline → use fallback silently
+      }
         }
       } catch {
         // API offline — fallback to localStorage
