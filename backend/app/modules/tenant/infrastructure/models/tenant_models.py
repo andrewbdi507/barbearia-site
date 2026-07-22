@@ -252,6 +252,7 @@ class TenantBrandingModel(Base, BaseModel):
     base_font_size: Mapped[str] = mapped_column(String(10), default="16px")
     border_radius: Mapped[str] = mapped_column(String(10), default="8px")
     layout_template: Mapped[str] = mapped_column(String(50), default="default")
+    theme: Mapped[str | None] = mapped_column(String(30), nullable=True, doc="Active theme slug (luxury/modern/classic/urban/minimal)")
     custom_css: Mapped[str | None] = mapped_column(Text, nullable=True)
     extra_data: Mapped[dict] = mapped_column(JSONB, default=dict)
 

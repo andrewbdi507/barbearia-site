@@ -91,10 +91,20 @@ export function ThemeSelector() {
     localStorage.setItem("barbershop_selected_theme", theme.id);
     setSaving(true);
 
-    // Simulate save to backend
+    // Save to backend
     try {
-      // TODO: PATCH /api/v1/tenants/me/branding with theme
-      await new Promise((r) => setTimeout(r, 400));
+      await tenantAPI.updateMe({ theme: slug } as Record<string, unknown>);
+      // Also update branding via the tenant branding endpoint
+      const API = `${import.meta.env.VITE_API_URL || ""}/api/v1`;
+      const token = sessionStorage.getItem("access_token");
+      await fetch(`${API}/tenants/me/branding`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ theme: slug }),
+      });
       setSuccessMsg(`Tema "${theme.name}" aplicado com sucesso!`);
       setTimeout(() => setSuccessMsg(null), 3000);
     } catch {

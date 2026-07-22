@@ -161,6 +161,7 @@ def _branding_to_entity(m: TenantBrandingModel) -> TenantBranding:
         base_font_size=m.base_font_size,
         border_radius=m.border_radius,
         layout_template=m.layout_template,
+        theme=getattr(m, "theme", None),
         custom_css=m.custom_css,
         metadata=m.extra_data or {},
         created_at=m.created_at,
@@ -679,7 +680,7 @@ class TenantBrandingRepository(ITenantBrandingRepository):
                 "primary_color", "secondary_color", "background_color",
                 "surface_color", "text_color", "text_light_color",
                 "heading_font", "body_font", "base_font_size",
-                "border_radius", "layout_template", "custom_css", "metadata",
+                "border_radius", "layout_template", "theme", "custom_css", "metadata",
             ):
                 setattr(existing, field, getattr(branding, field))
             existing.updated_at = datetime.now(timezone.utc)

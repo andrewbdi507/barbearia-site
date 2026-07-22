@@ -109,6 +109,7 @@ async def get_site(
     branding = {}
     if tenant.branding:
         branding = {
+            "theme": getattr(tenant.branding, "theme", None) or "urban",
             "logo_url": tenant.branding.logo_url,
             "logo_dark_url": tenant.branding.logo_dark_url,
             "favicon_url": tenant.branding.favicon_url,

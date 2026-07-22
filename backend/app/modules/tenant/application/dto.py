@@ -240,6 +240,7 @@ class TenantBrandingRequest(BaseModel):
     base_font_size: str | None = None
     border_radius: str | None = None
     layout_template: str | None = Field(default=None, max_length=50)
+    theme: str | None = Field(default=None, max_length=30)
     custom_css: str | None = None
     metadata: dict[str, Any] | None = None
 
@@ -264,6 +265,7 @@ class TenantBrandingResponse(BaseModel):
     base_font_size: str = "16px"
     border_radius: str = "8px"
     layout_template: str = "default"
+    theme: str | None = None
     custom_css: str | None = None
 
 

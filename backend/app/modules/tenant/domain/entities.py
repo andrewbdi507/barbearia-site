@@ -234,6 +234,7 @@ class TenantBranding:
     base_font_size: str = "16px"
     border_radius: str = "8px"
     layout_template: str = "default"
+    theme: str | None = None
     custom_css: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
