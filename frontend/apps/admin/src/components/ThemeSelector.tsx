@@ -62,7 +62,8 @@ export function ThemeSelector() {
       } else {
         setError("Erro ao carregar temas disponíveis.");
         setAllowedThemes(["minimal"]);
-      } finally {
+      }
+    } finally {
       setLoading(false);
     }
   }, []);
