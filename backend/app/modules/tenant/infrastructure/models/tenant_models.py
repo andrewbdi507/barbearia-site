@@ -41,6 +41,9 @@ class PlanModel(Base, BaseModel):
     price_yearly: Mapped[int] = mapped_column(Integer, default=0)
     limits: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     features: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    themes: Mapped[list] = mapped_column(JSONB, nullable=False, default=list, doc="Available theme slugs")
+    ai_tokens: Mapped[int | None] = mapped_column(Integer, nullable=True, doc="Monthly AI token limit (null=unlimited)")
+    max_concurrent_users: Mapped[int | None] = mapped_column(Integer, nullable=True, doc="Max simultaneous users (null=unlimited)")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_public: Mapped[bool] = mapped_column(Boolean, default=True)
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
@@ -160,6 +163,32 @@ class SubscriptionModel(Base, BaseModel):
 
     def __repr__(self) -> str:
         return f"<Subscription {self.id} ({self.status})>"
+
+
+# ============================================================
+# PlanUsage — Monthly usage tracking
+# ============================================================
+
+class PlanUsageModel(Base, BaseModel):
+    """Registro mensal de uso dos recursos do plano."""
+
+    __tablename__ = "plan_usage"
+
+    tenant_id: Mapped[str] = mapped_column(
+        UUID(as_uuid=False), ForeignKey("tenants.id", ondelete="CASCADE"),
+        nullable=False, index=True
+    )
+    month: Mapped[str] = mapped_column(String(7), nullable=False, doc="YYYY-MM")
+    bookings_count: Mapped[int] = mapped_column(Integer, default=0)
+    ai_tokens_used: Mapped[int] = mapped_column(Integer, default=0)
+    extra_data: Mapped[dict] = mapped_column(JSONB, default=dict)
+
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "month", name="uq_plan_usage_tenant_month"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<PlanUsage {self.tenant_id} {self.month}>"
 
 
 # ============================================================
