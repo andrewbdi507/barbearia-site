@@ -74,6 +74,19 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def health():
         return {"status": "healthy", "version": "1.1.0"}
 
+    @app.get("/health/cors-test")
+    async def health_cors_test():
+        from starlette.responses import JSONResponse
+        return JSONResponse(
+            content={"cors": "test"},
+            headers={
+                "access-control-allow-origin": "https://agendaos-frontend.onrender.com",
+                "access-control-allow-credentials": "true",
+                "access-control-allow-methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+                "access-control-allow-headers": "*",
+            }
+        )
+
     @app.get("/health/live")
     async def health_live():
         return {"status": "alive"}
