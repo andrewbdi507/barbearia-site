@@ -71,9 +71,22 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             except Exception:
                 from starlette.responses import JSONResponse as JR
                 from traceback import format_exc
+                import os
+                db_url = os.environ.get("DATABASE_URL", "NOT_SET")
+                # Mask password
+                if "@" in db_url:
+                    parts = db_url.split("@")
+                    if ":" in parts[0]:
+                        user_part = parts[0].rsplit(":", 1)
+                        db_url = user_part[0] + ":***@" + "@".join(parts[1:])
                 response = JR(
                     status_code=500,
-                    content={"error": "internal_error", "message": "Erro interno.", "detail": format_exc()[:500]},
+                    content={
+                        "error": "internal_error",
+                        "message": "Erro interno.",
+                        "detail": format_exc(),
+                        "db_url_masked": db_url,
+                    },
                 )
             response.headers["access-control-allow-origin"] = request.headers.get("origin", "*")
             response.headers["access-control-allow-credentials"] = "true"
