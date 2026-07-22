@@ -68,22 +68,35 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         expose_headers=["X-Request-ID"],
     )
 
-    # ---- RAW CORS FALLBACK (guaranteed) ----
-    from starlette.middleware.base import BaseHTTPMiddleware
-    from starlette.requests import Request
+    # ---- RAW CORS (pure ASGI — cannot fail) ----
+    from starlette.types import ASGIApp, Scope, Receive, Send
 
-    class RawCorsMiddleware(BaseHTTPMiddleware):
-        async def dispatch(self, request: Request, call_next):
-            response = await call_next(request)
-            response.headers["Access-Control-Allow-Origin"] = request.headers.get(
-                "origin", "*"
-            )
-            response.headers["Access-Control-Allow-Credentials"] = "true"
-            response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,PATCH,DELETE,OPTIONS"
-            response.headers["Access-Control-Allow-Headers"] = "*"
-            return response
+    class PureCorsMiddleware:
+        def __init__(self, app: ASGIApp) -> None:
+            self.app = app
 
-    app.add_middleware(RawCorsMiddleware)
+        async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] == "http":
+                async def cors_send(message):
+                    if message["type"] == "http.response.start":
+                        headers = dict(message.get("headers", []))
+                        origin = b"*"
+                        for h in scope.get("headers", []):
+                            if h[0] == b"origin":
+                                origin = h[1]
+                                break
+                        headers[b"access-control-allow-origin"] = origin
+                        headers[b"access-control-allow-credentials"] = b"true"
+                        headers[b"access-control-allow-methods"] = b"GET,POST,PUT,PATCH,DELETE,OPTIONS"
+                        headers[b"access-control-allow-headers"] = b"*"
+                        message["headers"] = list(headers.items())
+                    await send(message)
+
+                await self.app(scope, receive, cors_send)
+            else:
+                await self.app(scope, receive, send)
+
+    app.add_middleware(PureCorsMiddleware)
 
     # ---- Exception Handlers ----
     _register_exception_handlers(app)
