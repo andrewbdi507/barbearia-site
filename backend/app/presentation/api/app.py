@@ -68,6 +68,23 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         expose_headers=["X-Request-ID"],
     )
 
+    # ---- RAW CORS FALLBACK (guaranteed) ----
+    from starlette.middleware.base import BaseHTTPMiddleware
+    from starlette.requests import Request
+
+    class RawCorsMiddleware(BaseHTTPMiddleware):
+        async def dispatch(self, request: Request, call_next):
+            response = await call_next(request)
+            response.headers["Access-Control-Allow-Origin"] = request.headers.get(
+                "origin", "*"
+            )
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+            response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            return response
+
+    app.add_middleware(RawCorsMiddleware)
+
     # ---- Exception Handlers ----
     _register_exception_handlers(app)
 
