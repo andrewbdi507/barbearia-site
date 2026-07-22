@@ -1,11 +1,13 @@
 // ============================================================
-// ThemeProvider — Contexto global de tema com CSS Variables
-// Sincroniza com a API do backend via subdominio.
+// ThemeProvider — Unificado Admin + Site
+// Usa applyTheme do @barbershop/design-system para CSS variables.
+// Ambos apps compartilham as mesmas :root vars.
 // ============================================================
 import {
   createContext, useContext, useState, useEffect, useMemo, useCallback,
   type ReactNode,
 } from "react";
+import { applyTheme as applyDSTheme, themes as dsThemes, getThemeById } from "@barbershop/design-system";
 import { getTheme, themes as allThemes } from "./index";
 import type { Theme } from "./types";
 
@@ -20,14 +22,23 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 const DEFAULT_ID = "urban";
 
-function applyCSSVariables(theme: Theme): void {
-  const root = document.documentElement;
-  Object.entries(theme.cssVariables).forEach(([key, val]) => {
-    root.style.setProperty(key, val);
-  });
-  document.body.style.backgroundColor = theme.colors.background;
-  document.body.style.color = theme.colors.text;
-  document.body.className = `theme-${theme.id}`;
+function applyFullTheme(themeId: string): void {
+  const siteTheme = getTheme(themeId);
+  // Apply Site-specific extras
+  if (siteTheme) {
+    document.body.style.backgroundColor = siteTheme.colors.background;
+    document.body.style.color = siteTheme.colors.text;
+    document.body.className = `theme-${siteTheme.id}`;
+    // Apply Site CSS variables (finer-grained)
+    Object.entries(siteTheme.cssVariables).forEach(([key, val]) => {
+      document.documentElement.style.setProperty(key, val);
+    });
+  }
+  // Apply design-system CSS variables (used by both Admin + Site Tailwind)
+  const dsTheme = getThemeById(themeId);
+  if (dsTheme) {
+    applyDSTheme(dsTheme);
+  }
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -63,7 +74,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           if (apiTheme && allThemes[apiTheme] && !cancelled) {
             setThemeId(apiTheme);
             localStorage.setItem("barbershop_site_theme", apiTheme);
-            applyCSSVariables(allThemes[apiTheme]);
+            applyFullTheme(apiTheme);
             setIsLoading(false);
             return;
           }
@@ -88,7 +99,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isLoading) {
-      applyCSSVariables(currentTheme);
+      applyFullTheme(themeId);
     }
   }, [currentTheme, isLoading]);
 
@@ -96,7 +107,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     if (allThemes[id]) {
       setThemeId(id);
       localStorage.setItem("barbershop_site_theme", id);
-      applyCSSVariables(allThemes[id]);
+      applyFullTheme(id);
     }
   }, []);
 

@@ -2,6 +2,7 @@
 // Shared Tailwind Preset — Design System
 // Single source of truth for Tailwind config.
 // Both apps (admin + site) extend this preset.
+// ALL colors use CSS variables → theme changes affect both apps instantly.
 // ============================================================
 
 /** @type {import('tailwindcss').Config} */
@@ -11,52 +12,61 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#1a1a2e",
-          hover: "#16213e",
-          light: "#e8e8f0",
+          DEFAULT: "var(--color-primary, #D72638)",
+          hover: "var(--color-primary-hover, #E84050)",
+          light: "var(--color-primary-light, rgba(215,38,56,0.15))",
         },
         secondary: {
-          DEFAULT: "#e94560",
-          hover: "#d63851",
+          DEFAULT: "var(--color-secondary, #2A2A2A)",
+          hover: "var(--color-secondary-hover, #3A3A3A)",
         },
-        success: "#27ae60",
-        warning: "#f39c12",
-        error: "#e74c3c",
-        info: "#3498db",
+        accent: {
+          DEFAULT: "var(--color-accent, #D72638)",
+          hover: "var(--color-accent-hover, #E84050)",
+        },
+        success: "var(--color-success, #27ae60)",
+        warning: "var(--color-warning, #f39c12)",
+        error: "var(--color-error, #e74c3c)",
+        info: "var(--color-info, #3498db)",
         surface: {
-          DEFAULT: "#ffffff",
-          hover: "#f5f5f5",
+          DEFAULT: "var(--color-surface, #1A1A1A)",
+          hover: "var(--color-surface-hover, #262626)",
         },
-        background: "#fafafa",
-        "bg-dark": "#0f0f1a",
-        "surface-dark": "#1a1a2e",
-        "surface-hover-dark": "#252540",
-        "border-dark": "#2a2a40",
-        border: "#e0e0e0",
-        "text-primary": "#1a1a2e",
-        "text-secondary": "#666680",
-        "text-disabled": "#9e9eb0",
-        "text-inverse": "#ffffff",
-        "text-primary-dark": "#f0f0f5",
-        "text-secondary-dark": "#9999aa",
-        "text-disabled-dark": "#555566",
+        background: "var(--color-background, #0D0D0D)",
+        "bg-dark": "var(--color-background, #0D0D0D)",
+        "surface-dark": "var(--color-surface, #1A1A1A)",
+        "surface-hover-dark": "var(--color-surface-hover, #262626)",
+        "border-dark": "var(--color-border, rgba(215,38,56,0.3))",
+        border: {
+          DEFAULT: "var(--color-border, rgba(215,38,56,0.3))",
+          light: "var(--color-border-light, rgba(215,38,56,0.1))",
+        },
+        "text-primary": "var(--color-text, #F5F5F5)",
+        "text-secondary": "var(--color-text-secondary, #999999)",
+        "text-disabled": "var(--color-text-muted, #555555)",
+        "text-inverse": "var(--color-text-inverse, #0D0D0D)",
+        "text-primary-dark": "var(--color-text, #F5F5F5)",
+        "text-secondary-dark": "var(--color-text-secondary, #999999)",
+        "text-disabled-dark": "var(--color-text-muted, #555555)",
       },
       fontFamily: {
-        heading: ["Inter", "system-ui", "sans-serif"],
-        body: ["Inter", "system-ui", "sans-serif"],
+        heading: ["var(--font-heading, 'Bebas Neue')", "system-ui", "sans-serif"],
+        body: ["var(--font-body, 'Montserrat')", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
       borderRadius: {
-        sm: "4px",
-        md: "8px",
-        lg: "12px",
-        xl: "16px",
+        sm: "var(--radius-sm, 0px)",
+        md: "var(--radius-md, 0px)",
+        lg: "var(--radius-lg, 4px)",
+        xl: "var(--radius-xl, 8px)",
+        full: "9999px",
       },
       boxShadow: {
-        sm: "0 1px 2px rgba(0,0,0,0.05)",
-        md: "0 4px 12px rgba(0,0,0,0.08)",
-        lg: "0 8px 24px rgba(0,0,0,0.12)",
-        xl: "0 12px 48px rgba(0,0,0,0.15)",
+        sm: "var(--shadow-sm, 0 4px 0 rgba(215,38,56,0.3))",
+        md: "var(--shadow-md, 0 6px 0 rgba(215,38,56,0.4))",
+        lg: "var(--shadow-lg, 0 8px 32px rgba(215,38,56,0.2))",
+        xl: "var(--shadow-xl, 0 12px 48px rgba(0,0,0,0.6))",
+        glow: "var(--shadow-glow, 0 0 20px rgba(215,38,56,0.5))",
       },
       keyframes: {
         "fade-in": {
