@@ -93,6 +93,17 @@ interface ApiFAQItem {
   sort_order?: number;
 }
 
+interface ApiGalleryItem {
+  id?: string;
+  url?: string;
+  thumbnail_url?: string;
+  alt_text?: string;
+  title?: string;
+  width?: number;
+  height?: number;
+  media_type?: string;
+}
+
 export interface ApiSiteResponse {
   tenant?: ApiTenant;
   branding?: ApiBranding;
@@ -103,6 +114,7 @@ export interface ApiSiteResponse {
   business_hours?: ApiBusinessHour[];
   social_media?: ApiSocialMedia[];
   faq?: ApiFAQItem[];
+  gallery?: ApiGalleryItem[];
 }
 
 // ---- Helpers ----
@@ -237,7 +249,13 @@ export function mapApiToThemePageProps(
     aboutImage: api.content?.about_image_url,
     services: mapServices(api.services),
     professionals: mapProfessionals(api.team),
-    gallery: [], // indisponível na rota atual
+    gallery: (api.gallery || []).map((g) => ({
+      id: g.id || "",
+      src: g.url || "",
+      alt: g.alt_text || g.title || "",
+      width: g.width,
+      height: g.height,
+    })),
     testimonials: mapTestimonials(api.reviews),
     faq: (api.faq || []).map((f) => ({
       id: f.id || "",

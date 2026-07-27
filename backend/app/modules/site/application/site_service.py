@@ -53,6 +53,7 @@ class SiteService:
         reviews: list[dict[str, Any]] | None = None,
         business_hours: list[dict[str, Any]] | None = None,
         social_media: list[dict[str, Any]] | None = None,
+        gallery: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         """Retorna TODOS os dados do site em uma única chamada.
 
@@ -111,6 +112,7 @@ class SiteService:
             "reviews": reviews or [],
             "business_hours": business_hours or [],
             "social_media": social_media or [],
+            "gallery": gallery or [],
             "faq": [
                 {"id": f.id, "question": f.question, "answer": f.answer, "sort_order": f.sort_order}
                 for f in faq_items
