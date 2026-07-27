@@ -146,14 +146,18 @@ async def get_site(
         for sm in tenant.social_media
     ]
 
-    gallery_data = [
-        {"id": m.id, "url": m.url, "thumbnail_url": m.thumbnail_url,
-         "alt_text": m.alt_text or m.original_name, "title": m.title,
-         "width": m.width, "height": m.height,
-         "media_type": m.media_type, "sort_order": m.sort_order}
-        for m in tenant.media
-        if m.is_visible and m.media_type == "gallery"
-    ]
+    gallery_data = []
+    try:
+        gallery_data = [
+            {"id": m.id, "url": m.url, "thumbnail_url": m.thumbnail_url,
+             "alt_text": m.alt_text or m.original_name, "title": m.title,
+             "width": m.width, "height": m.height,
+             "media_type": m.media_type, "sort_order": m.sort_order}
+            for m in (getattr(tenant, 'media', None) or [])
+            if getattr(m, 'is_visible', True) and getattr(m, 'media_type', '') == "gallery"
+        ]
+    except Exception:
+        gallery_data = []
 
     result = await site_svc.get_site_data(
         tid, tenant_data, branding,
