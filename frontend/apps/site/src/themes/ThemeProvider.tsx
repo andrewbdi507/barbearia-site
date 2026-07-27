@@ -69,6 +69,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         const subdomain = (isRenderDomain || isLocalhost || parts.length <= 2)
           ? null
           : parts[0];
+
+        // Fallback: VITE_DEFAULT_SUBDOMAIN env var ou subdomínio do tenant principal
+        const defaultSubdomain =
+          ((import.meta as Record<string, unknown>).env
+            ? (import.meta as unknown as { env: Record<string, string> }).env.VITE_DEFAULT_SUBDOMAIN
+            : null) || "barbeariateste";
         const apiBase = (import.meta as Record<string, unknown>).env
           ? (import.meta as unknown as { env: Record<string, string> }).env.VITE_API_URL || ""
           : "";
@@ -77,7 +83,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         const timer = setTimeout(() => controller.abort(), 4000);
 
         const resp = await fetch(
-          `${apiBase}/api/v1/site?subdomain=${subdomain || "demo"}`,
+          `${apiBase}/api/v1/site?subdomain=${subdomain || defaultSubdomain}`,
           { signal: controller.signal, headers: { "Content-Type": "application/json" } }
         );
         clearTimeout(timer);
