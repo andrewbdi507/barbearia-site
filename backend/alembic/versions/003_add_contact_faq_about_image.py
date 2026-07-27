@@ -14,6 +14,7 @@ from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision: str = "003"
@@ -36,8 +37,8 @@ def upgrade() -> None:
     # ---- site_faq: new table ----
     op.create_table(
         "site_faq",
-        sa.Column("id", sa.String(36), primary_key=True),
-        sa.Column("tenant_id", sa.String(36), sa.ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True),
+        sa.Column("id", postgresql.UUID(as_uuid=False), primary_key=True, server_default=sa.text("gen_random_uuid()")),
+        sa.Column("tenant_id", postgresql.UUID(as_uuid=False), sa.ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True),
         sa.Column("question", sa.String(500), nullable=False),
         sa.Column("answer", sa.Text(), nullable=False, server_default=""),
         sa.Column("sort_order", sa.Integer(), nullable=False, server_default="0"),
