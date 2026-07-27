@@ -70,7 +70,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           ? null
           : parts[0];
 
-        // Fallback: VITE_DEFAULT_SUBDOMAIN env var ou subdomínio do tenant principal
+        // Fallback: VITE_DEFAULT_SUBDOMAIN env var (Render) ou subdomínio padrão
         const defaultSubdomain =
           ((import.meta as Record<string, unknown>).env
             ? (import.meta as unknown as { env: Record<string, string> }).env.VITE_DEFAULT_SUBDOMAIN
