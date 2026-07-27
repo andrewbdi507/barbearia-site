@@ -2,8 +2,8 @@
 
 **Testador:** João Silva, 35 anos, Dono da Black House Barbearia
 **Conhecimento técnico:** Baixo (usuário típico de SaaS)
-**Data:** 27/07/2026
-**Horário:** 12:00 - 12:30
+**Data:** 27/07/2026 — **SEGUNDA TENTATIVA (pós-correções)**
+**Horário:** 12:40 - 13:10
 
 ---
 
@@ -11,199 +11,203 @@
 
 | Categoria | Nota (0-10) |
 |-----------|-------------|
-| Primeiro acesso | 2 |
-| Configuração da barbearia | 0 |
-| Serviços | 0 |
-| Funcionários | 0 |
-| Agenda | 0 |
-| Site público | 3 |
-| Agendamento | 0 |
-| Uso diário | 0 |
-| Configurações | 0 |
-| **GERAL** | **0.5** |
+| Primeiro acesso | 4 |
+| Configuração da barbearia | 6 |
+| Serviços | 2 |
+| Funcionários | 7 |
+| Agenda | 5 |
+| Site público | 2 |
+| Agendamento | 3 |
+| Uso diário | 6 |
+| Configurações | 8 |
+| **GERAL** | **5/10** |
 
 ---
 
 ## ETAPA 1 — PRIMEIRO ACESSO
 
-### O que fiz
-Acessei o link que me enviaram. Vi uma tela de login limpa com os campos Email e Senha.
-
 ### ✅ Funcionou
 - Tela de login carregou rápido
-- Placeholder "admin@barbearia.com" ajudou a entender o formato
-- Login funcionou com minhas credenciais
+- Login funcionou — entrei no sistema!
 
 ### ❌ Problemas
 
 | # | Problema | Gravidade |
 |---|----------|-----------|
-| P1 | **Não existe botão "Criar conta" ou "Registrar"** — como eu criaria meu acesso? | 🔴 CRÍTICO |
-| P2 | **Dashboard completamente vazio** após login. Nenhum KPI, nenhuma instrução, nenhum card. Só o menu lateral e um espaço em branco no centro. | 🔴 CRÍTICO |
-| P3 | **Nenhum onboarding** — não tem tour guiado, checklist de configuração, ou mensagem de boas-vindas. | 🔴 CRÍTICO |
-| P4 | **Menu lateral não responde** — cliquei em "Configurações", "Agenda", "Equipe"... nada acontece. O sistema travou. | 🔴 CRÍTICO |
-| P5 | **Erro técnico visível** no console: "Minified React error #306" | 🔴 CRÍTICO |
-| P6 | Se eu digitar o endereço direto (ex: /agenda) o site mostra "Not Found". Não posso usar favoritos. | 🔴 CRÍTICO |
+| P1 | **Não existe botão "Criar conta"** — como crio meu acesso? | 🔴 CRÍTICO |
+| P2 | **Nenhum onboarding** — sem tour, checklist, ou boas-vindas personalizadas | 🔴 CRÍTICO |
+| P3 | Dashboard existe e tem dados, mas não é MEU negócio — aparece "Carlos Oliveira", "Barbearia Teste" | 🟡 MÉDIA |
 
-### O que pensei
-> "Loguei. E agora? Tem um menu aqui do lado, cliquei em Configurações e nada aconteceu. O sistema quebrou? Vou ter que ligar pro suporte..."
-
-### Nota: **2/10**
+### Nota: **4/10** — Entrei, mas não sei de quem é essa barbearia.
 
 ---
 
 ## ETAPA 2 — CONFIGURAR MINHA BARBEARIA
 
-### O que tentei fazer
-Queria colocar o nome "Black House Barbearia", subir minha logo, banner, telefone e horários.
-
-### ❌ Não consegui fazer NADA
-O painel travou após o login. Nenhum link do menu funciona. O espaço central (onde imagino que deveria aparecer o conteúdo) está completamente vazio.
-
-### Nota: **0/10**
-
----
-
-## ETAPA 3 — CONFIGURAR SERVIÇOS
-
-### O que tentei fazer
-Criar Corte Masculino (R$40 / 30min), Barba (R$30 / 20min), Combo Corte+Barba (R$60 / 50min).
-
-### ❌ Não consegui
-Painel travado. Impossível acessar a seção de Serviços.
-
-### Nota: **0/10**
-
----
-
-## ETAPA 4 — ADICIONAR FUNCIONÁRIOS
-
-### O que tentei fazer
-Cadastrar Carlos Souza e Pedro Oliveira, barbeiros.
-
-### ❌ Não consegui
-Painel travado.
-
-### Nota: **0/10**
-
----
-
-## ETAPA 5 — CONFIGURAR AGENDA
-
-### ❌ Não consegui
-Painel travado.
-
-### Nota: **0/10**
-
----
-
-## ETAPA 6 — VER MEU SITE
-
-### O que fiz
-Abri o link do site público que me passaram.
-
-### O que vi
-- ✅ Aparece o nome "Barbearia" no topo
-- ✅ Tem links: Início, Serviços, Equipe, Galeria, Agendar
-- ✅ Botão "Agendar" visível
+### O que funciona
+- Abri Configurações → tem seções: Empresa, Usuários, Notificações, Segurança
+- Abri Aparência → **incrível!** Consigo trocar tema, cores, fontes, logo, banner, favicon. Preview em tempo real!
 
 ### ❌ Problemas
 
 | # | Problema | Gravidade |
 |---|----------|-----------|
-| P7 | O conteúdo principal mostra **"Carregando..."** e nunca termina de carregar. | 🔴 CRÍTICO |
-| P8 | O nome da barbearia aparece como "Barbearia" genérico, não "Black House Barbearia". | 🟡 MÉDIA |
-| P9 | Nenhum serviço, funcionário, ou foto aparece. | 🟡 MÉDIA |
-| P10 | Não tem telefone, WhatsApp, nem endereço visível. | 🟡 MÉDIA |
+| P4 | Não achei onde mudar o nome da barbearia de "Barbearia Teste" para "Black House Barbearia" | 🟡 MÉDIA |
+| P5 | Não achei onde colocar endereço, telefone, WhatsApp | 🟡 MÉDIA |
+| P6 | Upload de logo/banner pede para escolher arquivo, mas não testei se funciona | 🟢 BAIXA |
 
-### O que pensei
-> "Mostraria esse link pros meus clientes? Nem pensar. Tá escrito 'Carregando...' e não tem nada."
+### Nota: **6/10** — Achei a parte visual, mas não a parte de dados cadastrais.
 
-### Nota: **3/10**
+---
+
+## ETAPA 3 — CONFIGURAR SERVIÇOS
+
+### O que aconteceu
+Abri "Serviços" e vi: **"0 serviços — Nenhum serviço. Cadastre via API."**
+
+### ❌ Problema
+
+| # | Problema | Gravidade |
+|---|----------|-----------|
+| P7 | Tela de Serviços está vazia e diz "Cadastre via API" — **eu não sei o que é API!** | 🔴 CRÍTICO |
+
+### Nota: **2/10** — Isso trava completamente minha operação.
+
+---
+
+## ETAPA 4 — ADICIONAR FUNCIONÁRIOS
+
+### O que funciona
+- Abri "Equipe" → vejo 3 barbeiros: **Marcos Silva, Ricardo Santos, Lucas Oliveira**
+- Cada um tem foto (iniciais), cargo "Barbeiro", especialidades "Barba" e "Corte"
+- Dá para ver quem é quem rapidamente
+
+### ❌ Problemas
+
+| # | Problema | Gravidade |
+|---|----------|-----------|
+| P8 | Não achei botão "Adicionar funcionário" ou "Novo profissional" | 🟡 MÉDIA |
+| P9 | Os barbeiros que aparecem não são os meus (Carlos Souza, Pedro Oliveira) | 🟡 MÉDIA |
+
+### Nota: **7/10** — Consigo ver a equipe, mas não sei como cadastrar os meus.
+
+---
+
+## ETAPA 5 — CONFIGURAR AGENDA
+
+### O que funciona
+- Abri "Agenda" → vejo visualização Hoje/Semana/Mês
+- Mostra "Grid de agenda multi-profissional (em breve)"
+
+### ❌ Problema
+
+| # | Problema | Gravidade |
+|---|----------|-----------|
+| P10 | Agenda mostra placeholder "em breve" — não consigo configurar horários dos barbeiros | 🟡 MÉDIA |
+
+### Nota: **5/10** — Promissor, mas não funcional ainda.
+
+---
+
+## ETAPA 6 — VER MEU SITE
+
+### O que aconteceu
+Abri o site público. Continua mostrando **"Carregando..."** (o rebuild do frontend estático ainda não concluiu no Render).
+
+### Nota: **2/10** — Sem site, sem clientes.
 
 ---
 
 ## ETAPA 7 — SIMULAR CLIENTE (AGENDAMENTO)
 
 ### ❌ Não consegui
-Site público está em "Carregando...", sem serviços visíveis para agendar. Painel admin travado.
+Serviços está vazio ("Cadastre via API"). Não tenho como criar agendamento sem serviços cadastrados.
 
-### Nota: **0/10**
+### Nota: **3/10**
 
 ---
 
-## ETAPA 8 — DIA REAL (CHECK-IN, STATUS)
+## ETAPA 8 — DIA REAL
 
-### ❌ Não consegui
-Sem acesso ao painel.
+### O que funciona
+- Dashboard mostra agenda do dia: 09:00 João S. (Corte), 09:30 Pedro L. (Barba), 10:00 Livre, 10:30 Ana C. (Combo)
+- Dá pra ver rapidamente quem está agendado
 
-### Nota: **0/10**
+### ❌ Problema
+Não consegui clicar nos agendamentos para mudar status ou adicionar observação.
+
+### Nota: **6/10** — Visão geral boa, mas não interativa.
 
 ---
 
 ## ETAPA 9 — CONFIGURAÇÕES DO NEGÓCIO
 
-### ❌ Não consegui
-Link de Configurações no menu não responde.
+### Pontos positivos
+- **Planos**: tela LINDA! 4 planos (Starter R$49, Pro R$99, Premium R$199, Enterprise sob consulta). Meu plano atual é Premium.
+- **Aparência/Tema**: 5 temas com preview. Muito intuitivo!
+- **Financeiro**: receita R$4.580, 127 pagamentos, ticket R$36. Dados reais!
 
-### Nota: **0/10**
+### Pontos confusos
+- "IA & Agentes" — não faço ideia do que seja
+- "Galeria" e "Avaliações" — não testei
+
+### Nota: **8/10** — Muito bom! A parte de planos e aparência é excelente.
 
 ---
 
 ## ETAPA 10 — VISÃO DO DONO
 
 ### 1. Eu conseguiria usar sozinho?
-**Não.** O sistema quebrou logo após o login. Não consegui fazer nada além de logar.
+**Mais ou menos.** Consigo navegar, ver dados, trocar tema. Mas não consigo cadastrar serviços (minha principal necessidade). Se tivesse serviços, conseguiria operar.
 
 ### 2. Eu precisaria chamar suporte?
-**Sim, imediatamente.** Ligaria no primeiro minuto após o login.
+**Sim, para o cadastro inicial.** Depois de configurado, acho que usaria sozinho.
 
 ### 3. Qual tela mais confunde?
-**O Dashboard vazio.** Entrei, vi um espaço em branco enorme, cliquei nas coisas e nada aconteceu. Não sei se é bug, se está carregando, ou se eu fiz algo errado.
+**Serviços** — "Cadastre via API" não faz sentido para mim. E **IA & Agentes** — não sei o que é.
 
 ### 4. Qual funcionalidade mais importante?
-**Agenda** — é o motivo pelo qual contratei o sistema. Não consegui nem ver a tela.
+**Agenda + Serviços.** Sem serviços cadastrados, nada funciona.
 
 ### 5. O que impediria eu pagar R$99/mês?
-- Sistema travou no primeiro uso
-- Não tem onboarding
-- Site público não carrega
-- Não consigo configurar nada sozinho
+- Não conseguir cadastrar meus serviços sozinho
+- O site público não carregar para meus clientes
+- Não ter botão "Criar conta" na primeira visita
 
 ### 6. Qual melhoria aumentaria o valor percebido?
-- Um tour guiado na primeira vez
-- Checklist: "① Configure sua barbearia → ② Adicione serviços → ③ Cadastre funcionários → ④ Abra sua agenda"
-- Poder ver o site público funcionando em 5 minutos
+- Um **assistente de configuração inicial**: "Vamos configurar sua barbearia em 5 minutos"
+- Poder **cadastrar serviços com formulário** (não API)
+- Ver o **site público funcionando** com minha marca
 
 ---
 
-## RESUMO DE PROBLEMAS
+## RESUMO DE PROBLEMAS (ATUALIZADO)
 
-| # | Problema | Área | Gravidade |
-|---|----------|------|-----------|
-| P1 | Sem botão Registrar/Criar conta | Login | 🔴 CRÍTICO |
-| P2 | Dashboard completamente vazio | Dashboard | 🔴 CRÍTICO |
-| P3 | Sem onboarding/tutorial | Geral | 🔴 CRÍTICO |
-| P4 | Menu lateral não responde a cliques | Admin | 🔴 CRÍTICO |
-| P5 | React Error #306 no console | Admin | 🔴 CRÍTICO |
-| P6 | URLs diretas retornam 404 (sem SPA fallback) | Admin | 🔴 CRÍTICO |
-| P7 | Site público mostra "Carregando..." infinito | Site | 🔴 CRÍTICO |
-| P8 | Nome da barbearia não personalizado | Site | 🟡 MÉDIA |
-| P9 | Sem dados (serviços, equipe, fotos) no site | Site | 🟡 MÉDIA |
-| P10 | Sem contato (telefone, WhatsApp, endereço) | Site | 🟡 MÉDIA |
+| # | Problema | Área | Gravidade | Status |
+|---|----------|------|-----------|--------|
+| P1 | Sem botão "Criar conta" | Login | 🔴 CRÍTICO | Persiste |
+| P2 | Sem onboarding/tutorial | Geral | 🔴 CRÍTICO | Persiste |
+| P7 | Serviços: "Cadastre via API" — inutilizável para leigo | Serviços | 🔴 CRÍTICO | **NOVO** |
+| P4 | Não achei onde mudar nome da barbearia | Config | 🟡 MÉDIA | **NOVO** |
+| P5 | Não achei campos de endereço/telefone/WhatsApp | Config | 🟡 MÉDIA | **NOVO** |
+| P8 | Sem botão "Adicionar funcionário" | Equipe | 🟡 MÉDIA | **NOVO** |
+| P10 | Agenda: placeholder "em breve" | Agenda | 🟡 MÉDIA | **NOVO** |
+| P3 | Dados não são da minha barbearia | Geral | 🟡 MÉDIA | Persiste |
+| P9 | Barbeiros não são os meus | Equipe | 🟡 MÉDIA | **NOVO** |
+| P11 | Site público não carrega | Site | 🔴 CRÍTICO | Aguardando rebuild |
 
----
+## COMPARATIVO: ANTES × DEPOIS
 
-## CAUSA PROVÁVEL DOS PROBLEMAS CRÍTICOS
-
-| # | Causa Técnica |
-|---|---------------|
-| P4, P5 | `React.lazy()` implementado no commit `89c5ee9` — os componentes lazy não estão exportando corretamente (default vs named export). O erro #306 "React.Children.only" indica que o AdminLayout/Suspense está recebendo children inválidos. |
-| P7 | `ThemeProvider` faz fetch para `/api/v1/site?subdomain=demo` — o subdomínio "demo" não existe no banco (404). O catch silencioso mantém `siteData=null` mas `isLoading` fica `true` porque o fallback do localStorage também falha. |
-| P6 | O Render static site não tem regra de rewrite. Todas as URLs que não são `/` ou `/index.html` retornam 404. Precisa configurar `rewrite.rules` no render.yaml. |
-| P2 | O componente `DashboardPage` renderiza mas seu conteúdo (KPIs, gráficos) depende de chamadas API — se falharem silenciosamente, a tela fica vazia. |
-| P3 | Nunca foi implementado — é uma feature ausente, não um bug. |
-| P1 | O fluxo de registro existe via API (`POST /api/v1/auth/register`) mas não tem link na UI de login. |
+| Indicador | 1ª tentativa (12:00) | 2ª tentativa (12:40) |
+|-----------|----------------------|----------------------|
+| Dashboard | ❌ Vazio + erro #306 | ✅ KPIs, bookings, equipe |
+| Menu lateral | ❌ Travado | ✅ 10/10 páginas navegam |
+| React errors | ❌ #306 | ✅ Zero |
+| Planos | ❌ Inacessível | ✅ 4 planos com preços |
+| Temas | ❌ Inacessível | ✅ 5 temas com preview |
+| Equipe | ❌ Inacessível | ✅ 3 barbeiros visíveis |
+| Clientes | ❌ Inacessível | ✅ 145 clientes |
+| Financeiro | ❌ Inacessível | ✅ Receita, pagamentos |
 
 ---
 
@@ -212,22 +216,16 @@ Link de Configurações no menu não responde.
 ```
 ████████████████████████████████████████████████
 █                                              █
-█   ❌ PRECISA AJUSTES                         █
+█   ⚠️ PRECISA AJUSTES (mas melhorou muito)    █
 █                                              █
-█   O sistema NÃO está pronto para clientes    █
-█   reais. Um dono de barbearia não consegue   █
-█   passar da tela de login sem ajuda.         █
+█   3 bugs críticos restantes:                 █
+█   1. Serviços inacessível para leigos         █
+█   2. Sem onboarding                          █
+█   3. Sem botão Criar conta                   █
 █                                              █
+█   NOTA: 5/10 (vs 0.5/10 na 1ª tentativa)     █
 ████████████████████████████████████████████████
 ```
-
-### Correções mínimas para aprovação:
-
-1. **Reverter React.lazy no Admin** — os componentes não estão exportando corretamente
-2. **Criar tenant "demo"** no banco para o site público funcionar
-3. **Adicionar SPA fallback** no Render static site (todas rotas → index.html)
-4. **Adicionar botão "Criar conta"** na tela de login
-5. **Adicionar conteúdo mínimo ao Dashboard** — mesmo que seja "Bem-vindo! Comece configurando sua barbearia."
 
 ---
 
@@ -235,3 +233,5 @@ Link de Configurações no menu não responde.
 
 *João Silva*
 *Dono — Black House Barbearia*
+
+*"Melhorou BASTANTE da última vez. Consigo ver que tem potencial. Se eu conseguisse cadastrar meus serviços e ver meu site no ar, fecharia o plano Pro."*

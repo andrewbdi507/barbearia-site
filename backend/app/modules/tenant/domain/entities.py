@@ -130,6 +130,7 @@ class Tenant:
     business_hours: list[BusinessHours] = field(default_factory=list)
     domains: list[Domain] = field(default_factory=list)
     social_media: list[SocialMedia] = field(default_factory=list)
+    media: list = field(default_factory=list)
 
     # ============================================================
     # Regras de Negócio

@@ -118,6 +118,10 @@ def _tenant_to_entity(m: TenantModel) -> Tenant:
         tenant.social_media = [_sm_to_entity(sm) for sm in m.social_media]
     except Exception:
         tenant.social_media = []
+    try:
+        tenant.media = list(m.media) if m.media else []
+    except Exception:
+        tenant.media = []
     return tenant
 
 
