@@ -88,14 +88,30 @@ function SiteSEO({ siteData }: { siteData: Record<string, unknown> | null }) {
 }
 
 export default memo(function ThemeHomePage() {
-  const { themeId, siteData } = useTheme();
+  const { themeId, siteData, isLoading } = useTheme();
   const ThemeComponent = getThemeComponent(themeId);
 
-  // Sem dados da API → mostra skeleton (white-label: nada de fallback fake)
-  if (!siteData) {
+  // Estado 1: Carregando (API ainda não respondeu)
+  if (isLoading) {
     return <ThemeSkeleton />;
   }
 
+  // Estado 2: Erro / site não encontrado (API respondeu mas sem dados)
+  if (!siteData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "var(--color-background, #111)" }}>
+        <div className="text-center px-6">
+          <div className="text-5xl mb-4">🔧</div>
+          <h2 className="text-xl font-semibold text-white mb-2">Site em construção</h2>
+          <p className="text-neutral-400 max-w-md">
+            Este site ainda não foi configurado. O proprietário precisa acessar o painel administrativo para ativar sua presença online.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Estado 3: Sucesso — dados disponíveis
   const tenant = mapApiToThemePageProps(siteData as Record<string, unknown>);
 
   return (

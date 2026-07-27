@@ -3,18 +3,41 @@ import { Suspense, lazy } from "react";
 import { AdminLayout } from "./layouts/AdminLayout";
 import { LoginPage } from "./pages/LoginPage";
 
-const DashboardPage = lazy(() => import("./pages/DashboardPage"));
-const AgendaPage = lazy(() => import("./pages/AgendaPage"));
-const ClientsPage = lazy(() => import("./pages/ClientsPage"));
-const ProfessionalsPage = lazy(() => import("./pages/ProfessionalsPage"));
-const ServicesPage = lazy(() => import("./pages/ServicesPage"));
-const FinancialPage = lazy(() => import("./pages/FinancialPage"));
-const ReportsPage = lazy(() => import("./pages/ReportsPage"));
-const SettingsPage = lazy(() => import("./pages/SettingsPage"));
-const ThemeConfigPage = lazy(() => import("./pages/ThemeConfigPage"));
+// React.lazy() exige export default. Páginas com named export
+// usam .then() para mapear o named → default.
+const DashboardPage = lazy(() =>
+  import("./pages/DashboardPage").then((m) => ({ default: m.DashboardPage }))
+);
+const AgendaPage = lazy(() =>
+  import("./pages/AgendaPage").then((m) => ({ default: m.AgendaPage }))
+);
+const ClientsPage = lazy(() =>
+  import("./pages/ClientsPage").then((m) => ({ default: m.ClientsPage }))
+);
+const ProfessionalsPage = lazy(() =>
+  import("./pages/ProfessionalsPage").then((m) => ({ default: m.ProfessionalsPage }))
+);
+const ServicesPage = lazy(() =>
+  import("./pages/ServicesPage").then((m) => ({ default: m.ServicesPage }))
+);
+const FinancialPage = lazy(() =>
+  import("./pages/FinancialPage").then((m) => ({ default: m.FinancialPage }))
+);
+const ReportsPage = lazy(() =>
+  import("./pages/ReportsPage").then((m) => ({ default: m.ReportsPage }))
+);
+const SettingsPage = lazy(() =>
+  import("./pages/SettingsPage").then((m) => ({ default: m.SettingsPage }))
+);
+const ThemeConfigPage = lazy(() =>
+  import("./pages/ThemeConfigPage").then((m) => ({ default: m.ThemeConfigPage }))
+);
+const SettingsPlanPage = lazy(() =>
+  import("./pages/SettingsPlanPage").then((m) => ({ default: m.SettingsPlanPage }))
+);
+// Pages with export default — no .then() needed
 const AgentsPage = lazy(() => import("./pages/AgentsPage"));
 const PlansPage = lazy(() => import("./pages/PlansPage"));
-const SettingsPlanPage = lazy(() => import("./pages/SettingsPlanPage"));
 
 function PageLoader() {
   return (

@@ -58,7 +58,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       try {
         const host = window.location.hostname;
         const parts = host.split(".");
-        const subdomain = parts.length > 2 ? parts[0] : null;
+
+        // Resolve subdomínio compatível com múltiplos ambientes:
+        // - localhost → usa fallback
+        // - *.onrender.com (Render auto-domains) → usa fallback (subdomínios não são tenants reais)
+        // - *.barbeariaos.com.br (domínio customizado) → extrai subdomínio
+        // - outros domínios → extrai subdomínio
+        const isRenderDomain = parts.length >= 3 && parts[parts.length - 2] === "onrender";
+        const isLocalhost = host === "localhost" || host === "127.0.0.1";
+        const subdomain = (isRenderDomain || isLocalhost || parts.length <= 2)
+          ? null
+          : parts[0];
         const apiBase = (import.meta as Record<string, unknown>).env
           ? (import.meta as unknown as { env: Record<string, string> }).env.VITE_API_URL || ""
           : "";
