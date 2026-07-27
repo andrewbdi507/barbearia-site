@@ -12,8 +12,8 @@ export const modern: Theme = {
 
   colors: {
     background: "#0A0A0A",
-    surface: "rgba(255,255,255,0.04)",
-    surfaceHover: "rgba(255,255,255,0.08)",
+    surface: "#111111",
+    surfaceHover: "#1A1A1A",
     primary: "#00D4FF",
     primaryHover: "#33DDFF",
     secondary: "#FF00FF",
@@ -113,8 +113,8 @@ export const modern: Theme = {
     "--color-primary": "#00D4FF",
     "--color-primary-hover": "#33DDFF",
     "--color-background": "#0A0A0A",
-    "--color-surface": "rgba(255,255,255,0.04)",
-    "--color-surface-hover": "rgba(255,255,255,0.08)",
+    "--color-surface": "#111111",
+    "--color-surface-hover": "#1A1A1A",
     "--color-text": "#FFFFFF",
     "--color-text-secondary": "#A0A0B0",
     "--color-accent": "#00D4FF",
