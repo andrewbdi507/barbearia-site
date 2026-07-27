@@ -17,6 +17,9 @@ export type { Theme, ThemeColors } from "./themes";
 // Theme Provider (React Context for dynamic theme switching)
 export { ThemeProvider, useTheme, type ThemeProviderProps } from "./components/ThemeProvider";
 
+// Error Boundary
+export { ErrorBoundary } from "./components/ErrorBoundary";
+
 // Components
 export { Button, type ButtonProps } from "./components/Button";
 export { Input, type InputProps } from "./components/Input";

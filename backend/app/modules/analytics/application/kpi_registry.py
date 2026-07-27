@@ -63,7 +63,7 @@ async def _kpi_revenue_today(session: AsyncSession, tid: str, dfrom: date, dto: 
     )
     yesterday = r2.scalar() or 0
     change = ((val - yesterday) / yesterday * 100) if yesterday > 0 else 0
-    return KPIData(key="revenue_today", label="Receita Hoje", value=val, format="currency",
+    return KPIData(name="revenue_today", label="Receita Hoje", value=val, format="currency",
                    trend="up" if change > 0 else "down" if change < 0 else "stable",
                    change_pct=round(change, 1), vs_last_period=yesterday)
 
@@ -76,7 +76,7 @@ async def _kpi_bookings_today(session: AsyncSession, tid: str, dfrom: date, dto:
         .where(BookingModel.booking_date == date.today())
         .where(BookingModel.status.in_(["confirmed", "completed", "in_progress"]))
     )
-    return KPIData(key="bookings_today", label="Agendamentos Hoje", value=r.scalar() or 0,
+    return KPIData(name="bookings_today", label="Agendamentos Hoje", value=r.scalar() or 0,
                    format="number")
 
 
@@ -96,7 +96,7 @@ async def _kpi_cancellation_rate(session: AsyncSession, tid: str, dfrom: date, d
     total = total_r.scalar() or 1
     cancelled = cancelled_r.scalar() or 0
     rate = round(cancelled / total * 100, 1)
-    return KPIData(key="cancellation_rate", label="Taxa de Cancelamento", value=rate,
+    return KPIData(name="cancellation_rate", label="Taxa de Cancelamento", value=rate,
                    format="percentage", trend="up" if rate > 20 else "stable")
 
 
@@ -109,7 +109,7 @@ async def _kpi_avg_ticket(session: AsyncSession, tid: str, dfrom: date, dto: dat
         .where(func.date(PaymentModel.paid_at) >= dfrom)
         .where(func.date(PaymentModel.paid_at) <= dto)
     )
-    return KPIData(key="avg_ticket", label="Ticket Médio", value=round(r.scalar() or 0),
+    return KPIData(name="avg_ticket", label="Ticket Médio", value=round(r.scalar() or 0),
                    format="currency")
 
 
@@ -122,7 +122,7 @@ async def _kpi_new_customers(session: AsyncSession, tid: str, dfrom: date, dto: 
         .where(func.date(CustomerModel.created_at) >= dfrom)
         .where(func.date(CustomerModel.created_at) <= dto)
     )
-    return KPIData(key="new_customers", label="Novos Clientes", value=r.scalar() or 0, format="number")
+    return KPIData(name="new_customers", label="Novos Clientes", value=r.scalar() or 0, format="number")
 
 
 async def _kpi_occupancy(session: AsyncSession, tid: str, dfrom: date, dto: date) -> KPIData:
@@ -142,7 +142,7 @@ async def _kpi_occupancy(session: AsyncSession, tid: str, dfrom: date, dto: date
     bookings = bookings_r.scalar() or 0
     max_slots = staff * 10 * ((dto - dfrom).days or 1)
     rate = round(bookings / max_slots * 100, 1)
-    return KPIData(key="occupancy", label="Taxa de Ocupação", value=rate, format="percentage")
+    return KPIData(name="occupancy", label="Taxa de Ocupação", value=rate, format="percentage")
 
 
 async def _kpi_no_show(session: AsyncSession, tid: str, dfrom: date, dto: date) -> KPIData:
@@ -153,7 +153,7 @@ async def _kpi_no_show(session: AsyncSession, tid: str, dfrom: date, dto: date) 
         .where(BookingModel.booking_date >= dfrom).where(BookingModel.booking_date <= dto)
         .where(BookingModel.status == "no_show")
     )
-    return KPIData(key="no_show", label="No-Show", value=r.scalar() or 0, format="number")
+    return KPIData(name="no_show", label="No-Show", value=r.scalar() or 0, format="number")
 
 
 # ============================================================

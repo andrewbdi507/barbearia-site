@@ -45,9 +45,12 @@ class AnalyticsService:
                 result = await kpi["compute"](self._s, tenant_id, dfrom, dto)
                 result.period = period
                 results.append(result)
-            except Exception:
+            except Exception as e:
+                import structlog
+                logger = structlog.get_logger()
+                logger.warning("kpi_compute_failed", kpi_name=key, error=str(e))
                 results.append(KPIData(
-                    key=key, label=kpi["label"], value=0, format=kpi["format"],
+                    name=key, label=kpi["label"], value=0, format=kpi["format"],
                     trend="stable", period=period,
                 ))
 
