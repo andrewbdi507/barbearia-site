@@ -147,5 +147,6 @@ export const planAPI = {
 export const tenantAPI = {
   me: () => request<TenantMeDTO>(`${API}/tenants/me`),
   updateMe: (data: Record<string, unknown>) => request<TenantMeDTO>(`${API}/tenants/me`, { method: "PATCH", body: JSON.stringify(data) }),
+  updateBranding: (data: Record<string, unknown>) => request<Record<string, unknown>>(`${API}/tenants/me/branding`, { method: "PUT", body: JSON.stringify(data) }),
   getSubscription: () => request<{ id: string; plan_id: string; status: string; trial_ends_at: string | null }>(`${API}/tenants/me/subscription`),
 };

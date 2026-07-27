@@ -154,26 +154,24 @@ export function ThemeConfigPage() {
   const handleSave = useCallback(async () => {
     setSaving(true);
     try {
-      await tenantAPI.updateMe({
-        branding: {
-          theme: editor.theme,
-          primary_color: editor.primaryColor,
-          secondary_color: editor.secondaryColor,
-          background_color: editor.backgroundColor,
-          surface_color: editor.surfaceColor,
-          text_color: editor.textColor,
-          text_light_color: editor.textLightColor,
-          heading_font: editor.headingFont,
-          body_font: editor.bodyFont,
-          base_font_size: editor.baseFontSize,
-          border_radius: editor.borderRadius,
-          logo_url: editor.logoUrl || null,
-          banner_url: editor.bannerUrl || null,
-          favicon_url: editor.faviconUrl || null,
-          banner_title: editor.bannerTitle || null,
-          banner_subtitle: editor.bannerSubtitle || null,
-          banner_cta_text: editor.ctaText,
-        },
+      await tenantAPI.updateBranding({
+        theme: editor.theme,
+        primary_color: editor.primaryColor,
+        secondary_color: editor.secondaryColor,
+        background_color: editor.backgroundColor,
+        surface_color: editor.surfaceColor,
+        text_color: editor.textColor,
+        text_light_color: editor.textLightColor,
+        heading_font: editor.headingFont,
+        body_font: editor.bodyFont,
+        base_font_size: editor.baseFontSize,
+        border_radius: editor.borderRadius,
+        logo_url: editor.logoUrl || null,
+        banner_url: editor.bannerUrl || null,
+        favicon_url: editor.faviconUrl || null,
+        banner_title: editor.bannerTitle || null,
+        banner_subtitle: editor.bannerSubtitle || null,
+        banner_cta_text: editor.ctaText,
       });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);

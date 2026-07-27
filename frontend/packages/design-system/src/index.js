@@ -10,6 +10,8 @@ export { tokens } from "./tokens";
 export { themes, applyTheme, getThemeById } from "./themes";
 // Theme Provider (React Context for dynamic theme switching)
 export { ThemeProvider, useTheme } from "./components/ThemeProvider";
+// Error Boundary
+export { ErrorBoundary } from "./components/ErrorBoundary";
 // Components
 export { Button } from "./components/Button";
 export { Input } from "./components/Input";

@@ -4,6 +4,7 @@ export type { DesignTokens } from "./tokens";
 export { themes, applyTheme, getThemeById } from "./themes";
 export type { Theme, ThemeColors } from "./themes";
 export { ThemeProvider, useTheme, type ThemeProviderProps } from "./components/ThemeProvider";
+export { ErrorBoundary } from "./components/ErrorBoundary";
 export { Button, type ButtonProps } from "./components/Button";
 export { Input, type InputProps } from "./components/Input";
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter, CardStat, type CardProps, } from "./components/Card";
