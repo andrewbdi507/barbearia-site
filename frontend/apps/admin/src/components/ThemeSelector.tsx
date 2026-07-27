@@ -11,6 +11,7 @@ const THEME_SLUG_MAP: Record<string, string> = {
   minimal: "minimal",
   classic: "classic",
   modern: "modern",
+  custom: "custom",
 };
 
 // ---- Component ----

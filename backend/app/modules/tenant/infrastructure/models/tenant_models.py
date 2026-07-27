@@ -94,6 +94,13 @@ class TenantModel(Base, BaseModel):
         DateTime(timezone=True), nullable=True, index=True
     )
 
+    # ---- Contact / Location (public site) ----
+    address: Mapped[str | None] = mapped_column(Text, nullable=True, doc="Endereço completo para site público")
+    phone: Mapped[str | None] = mapped_column(String(30), nullable=True, doc="Telefone comercial")
+    email: Mapped[str | None] = mapped_column(String(255), nullable=True, doc="Email público de contato")
+    whatsapp: Mapped[str | None] = mapped_column(String(30), nullable=True, doc="WhatsApp (DDI+DDD+número)")
+    map_embed_url: Mapped[str | None] = mapped_column(Text, nullable=True, doc="URL de embed do Google Maps")
+
     # Relationships
     plan: Mapped[PlanModel | None] = relationship("PlanModel", back_populates="tenants", lazy="selectin", foreign_keys=[plan_id])
     settings: Mapped["TenantSettingsModel | None"] = relationship(

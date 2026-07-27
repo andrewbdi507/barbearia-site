@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-from app.modules.site.domain.entities import SEOSettings, SiteContent, SitePage
+from app.modules.site.domain.entities import FAQItem, SEOSettings, SiteContent, SitePage
 
 
 class ISitePageRepository(ABC):
@@ -28,3 +28,12 @@ class ISiteContentRepository(ABC):
     async def get_for_tenant(self, tenant_id: str) -> SiteContent | None: ...
     @abstractmethod
     async def upsert(self, content: SiteContent) -> SiteContent: ...
+
+
+class IFAQRepository(ABC):
+    @abstractmethod
+    async def list_for_tenant(self, tenant_id: str) -> list[FAQItem]: ...
+    @abstractmethod
+    async def upsert(self, faq: FAQItem) -> FAQItem: ...
+    @abstractmethod
+    async def delete(self, faq_id: str) -> None: ...

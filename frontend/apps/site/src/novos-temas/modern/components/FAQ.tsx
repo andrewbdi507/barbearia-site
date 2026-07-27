@@ -1,0 +1,38 @@
+// ============================================================
+// MODERN Theme — FAQ
+// ============================================================
+
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown } from "lucide-react";
+import type { FAQProps } from "../../shared/types";
+import { tokens } from "../constants/tokens";
+
+export function FAQ({ title, subtitle, items }: FAQProps) {
+  const [open, setOpen] = useState<string | null>(null);
+  return (
+    <section style={{ backgroundColor: tokens.colors.background, paddingTop: tokens.spacing.section, paddingBottom: tokens.spacing.section }} aria-labelledby="modern-faq-title">
+      <div className="max-w-[800px] mx-auto px-6 md:px-12">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} className="mb-16 text-center">
+          <span className="inline-block mb-4 text-xs font-semibold tracking-widest uppercase" style={{ color: tokens.colors.primary, fontFamily: tokens.typography.bodyFont }}>FAQ</span>
+          <h2 id="modern-faq-title" style={{ fontFamily: tokens.typography.headingFont, fontSize: tokens.typography.scale.h2, fontWeight: tokens.typography.weight.bold, color: tokens.colors.text }}>{title}</h2>
+          {subtitle && <p className="mt-4" style={{ fontFamily: tokens.typography.bodyFont, color: tokens.colors.textSecondary }}>{subtitle}</p>}
+        </motion.div>
+        <div className="space-y-3">
+          {items.map((item, i) => {
+            const isO = open === item.id;
+            return (
+              <motion.div key={item.id || i} initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.04 }} className="border overflow-hidden backdrop-blur-xl transition-all duration-300" style={{ borderColor: isO ? tokens.colors.primary : tokens.colors.border, backgroundColor: tokens.colors.surface, borderRadius: tokens.borderRadius.lg }}>
+                <button onClick={() => setOpen((pv) => (pv === item.id ? null : item.id))} className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left" aria-expanded={isO}>
+                  <span className="text-sm font-medium" style={{ fontFamily: tokens.typography.bodyFont, color: isO ? tokens.colors.primary : tokens.colors.text }}>{item.question}</span>
+                  <motion.span animate={{ rotate: isO ? 180 : 0 }} transition={{ duration: 0.25 }}><ChevronDown className="w-4 h-4" style={{ color: tokens.colors.primary }} /></motion.span>
+                </button>
+                <AnimatePresence initial={false}>{isO && <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden"><p className="px-6 pb-5 text-sm leading-relaxed" style={{ fontFamily: tokens.typography.bodyFont, color: tokens.colors.textSecondary }}>{item.answer}</p></motion.div>}</AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}

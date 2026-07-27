@@ -1,0 +1,10 @@
+export { Hero } from "./Hero";
+export { About } from "./About";
+export { Services } from "./Services";
+export { Professionals } from "./Professionals";
+export { Gallery } from "./Gallery";
+export { Testimonials } from "./Testimonials";
+export { FAQ } from "./FAQ";
+export { BookingCTA } from "./BookingCTA";
+export { Contact } from "./Contact";
+export { Footer } from "./Footer";

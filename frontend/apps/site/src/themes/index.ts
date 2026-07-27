@@ -7,6 +7,7 @@ import { modern } from "./modern";
 import { classic } from "./classic";
 import { urban } from "./urban";
 import { minimal } from "./minimal";
+import { custom } from "./custom";
 
 export const themes: Record<string, Theme> = {
   luxury,
@@ -14,12 +15,13 @@ export const themes: Record<string, Theme> = {
   classic,
   urban,
   minimal,
+  custom,
 };
 
 export const themeList: Theme[] = Object.values(themes);
 
 export function getTheme(id: string): Theme {
-  return themes[id] || luxury;
+  return themes[id] || custom;
 }
 
 export { type Theme } from "./types";

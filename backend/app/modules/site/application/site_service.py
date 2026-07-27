@@ -12,8 +12,8 @@ from typing import Any
 from uuid import uuid4
 
 from app.core.exceptions import NotFoundError
-from app.modules.site.domain.entities import SEOSettings, SiteContent, SitePage
-from app.modules.site.domain.interfaces import ISEORepository, ISiteContentRepository, ISitePageRepository
+from app.modules.site.domain.entities import FAQItem, SEOSettings, SiteContent, SitePage
+from app.modules.site.domain.interfaces import IFAQRepository, ISEORepository, ISiteContentRepository, ISitePageRepository
 
 
 class SiteService:
@@ -32,10 +32,12 @@ class SiteService:
         page_repo: ISitePageRepository,
         seo_repo: ISEORepository,
         content_repo: ISiteContentRepository,
+        faq_repo: IFAQRepository | None = None,
     ) -> None:
         self._pages = page_repo
         self._seo = seo_repo
         self._content = content_repo
+        self._faq = faq_repo
 
     # ============================================================
     # Aggregated Site Data (GET /site)
@@ -59,6 +61,7 @@ class SiteService:
         content = await self._content.get_for_tenant(tenant_id)
         seo = await self._seo.get_for_tenant(tenant_id)
         pages = await self._pages.list_by_tenant(tenant_id)
+        faq_items = await self._faq.list_for_tenant(tenant_id) if self._faq else []
 
         # Gerar CSS variables
         css_vars = self.generate_css_variables(branding_data or {})
@@ -77,6 +80,11 @@ class SiteService:
                 "name": tenant_data.get("name", ""),
                 "subdomain": tenant_data.get("subdomain", ""),
                 "status": tenant_data.get("status", ""),
+                "address": tenant_data.get("address"),
+                "phone": tenant_data.get("phone"),
+                "email": tenant_data.get("email"),
+                "whatsapp": tenant_data.get("whatsapp"),
+                "map_embed_url": tenant_data.get("map_embed_url"),
             },
             "branding": branding_data or {},
             "css_variables": css_vars,
@@ -90,6 +98,7 @@ class SiteService:
                 "hero_video_url": content.hero_video_url if content else None,
                 "about_title": content.about_title if content else "Sobre Nós",
                 "about_text": content.about_text if content else "",
+                "about_image_url": content.about_image_url if content else None,
                 "promotions": content.promotions if content else [],
                 "highlights": content.highlights if content else [],
                 "show_services": content.show_services if content else True,
@@ -102,6 +111,10 @@ class SiteService:
             "reviews": reviews or [],
             "business_hours": business_hours or [],
             "social_media": social_media or [],
+            "faq": [
+                {"id": f.id, "question": f.question, "answer": f.answer, "sort_order": f.sort_order}
+                for f in faq_items
+            ],
             "pages": [
                 {"slug": p.slug, "title": p.title, "is_published": p.is_published}
                 for p in pages
@@ -271,3 +284,26 @@ class SiteService:
                 setattr(content, k, v)
 
         return await self._content.upsert(content)
+
+    # ============================================================
+    # FAQ
+    # ============================================================
+
+    async def list_faq(self, tenant_id: str) -> list[FAQItem]:
+        if not self._faq:
+            return []
+        return await self._faq.list_for_tenant(tenant_id)
+
+    async def upsert_faq(self, tenant_id: str, **kwargs: object) -> FAQItem:
+        if not self._faq:
+            raise RuntimeError("FAQ repository not configured")
+        faq = FAQItem(id=str(uuid4()), tenant_id=tenant_id)
+        for k, v in kwargs.items():
+            if hasattr(faq, k):
+                setattr(faq, k, v)
+        return await self._faq.upsert(faq)
+
+    async def delete_faq(self, faq_id: str) -> None:
+        if not self._faq:
+            raise RuntimeError("FAQ repository not configured")
+        await self._faq.delete(faq_id)

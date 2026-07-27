@@ -57,6 +57,7 @@ class SiteContentUpdateRequest(BaseModel):
     hero_banner_url: str | None = None
     about_title: str | None = None
     about_text: str | None = None
+    about_image_url: str | None = None
     promotions: list[dict[str, Any]] | None = None
     highlights: list[str] | None = None
     show_services: bool | None = None
@@ -72,9 +73,23 @@ class SiteContentResponse(BaseModel):
     hero_banner_url: str | None = None
     about_title: str
     about_text: str
+    about_image_url: str | None = None
     promotions: list[dict[str, Any]]
     highlights: list[str]
     show_services: bool
     show_team: bool
     show_reviews: bool
     show_gallery: bool
+
+
+class FAQUpdateRequest(BaseModel):
+    question: str = Field(..., min_length=1, max_length=500)
+    answer: str = Field(default="")
+    sort_order: int = Field(default=0)
+
+
+class FAQResponse(BaseModel):
+    id: str
+    question: str
+    answer: str
+    sort_order: int

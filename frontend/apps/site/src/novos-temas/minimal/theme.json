@@ -1,0 +1,31 @@
+{
+  "name": "Minimal",
+  "version": "1.0.0",
+  "author": "AgendaOS Design Team",
+  "description": "Tema minimalista e funcional — muito espaço em branco, poucas cores, linhas finas e foco total no conteúdo. Inspirado no design suíço e escandinavo.",
+  "category": "minimal",
+  "tags": ["clean", "white", "minimal", "functional", "swiss", "scandinavian"],
+  "style": { "mood": "Limpo, funcional, sereno", "target": "Barbearias modernas com foco em simplicidade", "inspiration": "Muji, Apple (early), Swiss Design, Scandinavian interiors" },
+  "colors": {
+    "background": "#FAFAFA", "surface": "#FFFFFF", "surfaceAlt": "#F5F5F5", "surfaceHover": "#EEEEEE",
+    "primary": "#1A1A1A", "primaryHover": "#333333", "primaryLight": "rgba(26,26,26,0.06)",
+    "secondary": "#666666", "secondaryHover": "#777777",
+    "text": "#111111", "textSecondary": "#444444", "textMuted": "#666666", "textInverse": "#FFFFFF",
+    "accent": "#1A1A1A", "accentHover": "#333333",
+    "border": "rgba(0,0,0,0.08)", "borderLight": "rgba(0,0,0,0.04)",
+    "success": "#2ECC71", "error": "#E74C3C", "warning": "#F39C12", "info": "#3498DB",
+    "gradientHero": "none", "gradientSection": "none", "gradientCard": "none"
+  },
+  "typography": {
+    "headingFont": "'Inter', 'SF Pro Display', sans-serif", "bodyFont": "'Inter', 'DM Sans', sans-serif", "monoFont": "'JetBrains Mono', monospace",
+    "scale": { "display": "clamp(2.5rem, 6vw, 5rem)", "h1": "clamp(2rem, 4.5vw, 3.5rem)", "h2": "clamp(1.5rem, 3vw, 2.5rem)", "h3": "clamp(1.1rem, 2vw, 1.6rem)", "h4": "clamp(1rem, 1.5vw, 1.3rem)", "h5": "0.9rem", "body": "0.95rem", "small": "0.8rem", "caption": "0.7rem" },
+    "weight": { "light": 300, "regular": 400, "medium": 500, "semibold": 600, "bold": 700, "extrabold": 800 },
+    "letterSpacing": { "tight": "-0.02em", "normal": "-0.01em", "wide": "0.05em" },
+    "lineHeight": { "tight": 1.15, "normal": 1.55, "relaxed": 1.7 }
+  },
+  "spacing": { "section": "clamp(3rem, 8vw, 7rem)", "sectionInner": "clamp(2rem, 5vw, 4rem)", "element": "clamp(1rem, 3vw, 2rem)", "card": "1.5rem", "gap": "1.25rem", "gapSmall": "0.75rem", "padding": "1.25rem", "container": "1200px" },
+  "borderRadius": { "none": "0", "sm": "4px", "md": "6px", "lg": "10px", "xl": "14px", "2xl": "20px", "full": "9999px" },
+  "shadows": { "none": "none", "xs": "0 1px 2px rgba(0,0,0,0.03)", "sm": "0 1px 3px rgba(0,0,0,0.05)", "md": "0 2px 8px rgba(0,0,0,0.06)", "lg": "0 4px 16px rgba(0,0,0,0.08)", "xl": "0 8px 32px rgba(0,0,0,0.10)", "2xl": "0 12px 48px rgba(0,0,0,0.12)", "glow": "none", "glowStrong": "none", "inner": "inset 0 1px 2px rgba(0,0,0,0.04)" },
+  "motion": { "duration": { "instant": 100, "fast": 150, "normal": 250, "slow": 400, "slower": 600 }, "easing": { "easeOut": [0.4, 0, 0.2, 1], "easeIn": [0.4, 0, 1, 1], "easeInOut": [0.4, 0, 0.2, 1], "spring": { "stiffness": 150, "damping": 18, "mass": 1 }, "bounce": { "stiffness": 250, "damping": 10 } }, "stagger": 0.04 },
+  "glassmorphism": { "enabled": false, "blur": "0px", "opacity": 0, "borderOpacity": 0 }
+}

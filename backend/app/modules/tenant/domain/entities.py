@@ -117,6 +117,13 @@ class Tenant:
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     deleted_at: datetime | None = None
 
+    # Contact / Location (public site)
+    address: str | None = None
+    phone: str | None = None
+    email: str | None = None
+    whatsapp: str | None = None
+    map_embed_url: str | None = None
+
     # Relacionamentos (carregados sob demanda)
     settings: TenantSettings | None = None
     branding: TenantBranding | None = None

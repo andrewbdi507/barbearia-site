@@ -70,6 +70,20 @@ class SiteContent:
     show_team: bool = True
     show_reviews: bool = True
     show_gallery: bool = True
+    about_image_url: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
+    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+
+
+@dataclass
+class FAQItem:
+    """Pergunta frequente do site público."""
+
+    id: str
+    tenant_id: str
+    question: str
+    answer: str = ""
+    sort_order: int = 0
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))

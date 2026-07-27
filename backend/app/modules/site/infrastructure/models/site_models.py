@@ -59,4 +59,18 @@ class SiteContentModel(Base, BaseModel):
     show_team: Mapped[bool] = mapped_column(Boolean, default=True)
     show_reviews: Mapped[bool] = mapped_column(Boolean, default=True)
     show_gallery: Mapped[bool] = mapped_column(Boolean, default=True)
+    about_image_url: Mapped[str | None] = mapped_column(Text, nullable=True, doc="Imagem da seção Sobre")
     extra_data: Mapped[dict] = mapped_column(JSONB, default=dict)
+
+
+class FAQItemModel(Base, BaseModel):
+    """FAQ — Perguntas frequentes do site público."""
+
+    __tablename__ = "site_faq"
+
+    question: Mapped[str] = mapped_column(String(500), nullable=False)
+    answer: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+
+    def __repr__(self) -> str:
+        return f"<FAQ {self.question[:50]}>"

@@ -7,9 +7,9 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.site.domain.entities import SEOSettings, SiteContent, SitePage
-from app.modules.site.domain.interfaces import ISEORepository, ISiteContentRepository, ISitePageRepository
-from app.modules.site.infrastructure.models.site_models import SEOSettingsModel, SiteContentModel, SitePageModel
+from app.modules.site.domain.entities import FAQItem, SEOSettings, SiteContent, SitePage
+from app.modules.site.domain.interfaces import IFAQRepository, ISEORepository, ISiteContentRepository, ISitePageRepository
+from app.modules.site.infrastructure.models.site_models import FAQItemModel, SEOSettingsModel, SiteContentModel, SitePageModel
 
 
 def _page_to_entity(m: SitePageModel) -> SitePage:
@@ -44,10 +44,11 @@ def _content_to_entity(m: SiteContentModel) -> SiteContent:
         hero_cta_text=m.hero_cta_text, hero_banner_url=m.hero_banner_url,
         hero_video_url=m.hero_video_url,
         about_title=m.about_title, about_text=m.about_text,
+        about_image_url=m.about_image_url,
         promotions=m.promotions or [], highlights=m.highlights or [],
         show_services=m.show_services, show_team=m.show_team,
         show_reviews=m.show_reviews, show_gallery=m.show_gallery,
-        metadata=m.metadata or {}, created_at=m.created_at, updated_at=m.updated_at,
+        metadata=m.extra_data or {}, created_at=m.created_at, updated_at=m.updated_at,
     )
 
 
@@ -155,10 +156,11 @@ class SiteContentRepository(ISiteContentRepository):
         m = r.scalar_one_or_none()
         if m:
             for f in ("hero_title", "hero_subtitle", "hero_cta_text", "hero_banner_url",
-                       "hero_video_url", "about_title", "about_text", "promotions",
-                       "highlights", "show_services", "show_team", "show_reviews",
-                       "show_gallery", "metadata"):
+                       "hero_video_url", "about_title", "about_text", "about_image_url",
+                       "promotions", "highlights", "show_services", "show_team",
+                       "show_reviews", "show_gallery"):
                 setattr(m, f, getattr(content, f))
+            m.extra_data = content.metadata
             m.updated_at = datetime.now(timezone.utc)
         else:
             m = SiteContentModel(
@@ -167,7 +169,62 @@ class SiteContentRepository(ISiteContentRepository):
                 hero_cta_text=content.hero_cta_text,
                 hero_banner_url=content.hero_banner_url,
                 about_title=content.about_title, about_text=content.about_text,
+                about_image_url=content.about_image_url,
             )
             self._s.add(m)
         await self._s.flush()
         return content
+
+
+# ============================================================
+# FAQ Repository
+# ============================================================
+
+def _faq_to_entity(m: FAQItemModel) -> FAQItem:
+    return FAQItem(
+        id=m.id, tenant_id=m.tenant_id or "",
+        question=m.question, answer=m.answer,
+        sort_order=m.sort_order, created_at=m.created_at, updated_at=m.updated_at,
+    )
+
+
+class FAQRepository(IFAQRepository):
+    def __init__(self, session: AsyncSession) -> None:
+        self._s = session
+
+    async def list_for_tenant(self, tenant_id: str) -> list[FAQItem]:
+        r = await self._s.execute(
+            select(FAQItemModel)
+            .where(FAQItemModel.tenant_id == tenant_id)
+            .order_by(FAQItemModel.sort_order)
+        )
+        return [_faq_to_entity(m) for m in r.scalars().all()]
+
+    async def upsert(self, faq: FAQItem) -> FAQItem:
+        r = await self._s.execute(
+            select(FAQItemModel).where(FAQItemModel.id == faq.id)
+        )
+        m = r.scalar_one_or_none()
+        if m:
+            m.question = faq.question
+            m.answer = faq.answer
+            m.sort_order = faq.sort_order
+            m.updated_at = datetime.now(timezone.utc)
+        else:
+            m = FAQItemModel(
+                id=faq.id, tenant_id=faq.tenant_id,
+                question=faq.question, answer=faq.answer,
+                sort_order=faq.sort_order,
+            )
+            self._s.add(m)
+        await self._s.flush()
+        return _faq_to_entity(m)
+
+    async def delete(self, faq_id: str) -> None:
+        r = await self._s.execute(
+            select(FAQItemModel).where(FAQItemModel.id == faq_id)
+        )
+        m = r.scalar_one_or_none()
+        if m:
+            await self._s.delete(m)
+            await self._s.flush()

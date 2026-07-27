@@ -1,0 +1,92 @@
+// ============================================================
+// URBAN Theme — Constants
+// Tokens e valores fixos do tema.
+// ============================================================
+
+import type { ThemeTokens } from "../../shared/types";
+
+export const tokens: ThemeTokens = {
+  colors: {
+    background: "#0A0A0A",
+    surface: "#141414",
+    surfaceAlt: "#1C1C1C",
+    surfaceHover: "#242424",
+    primary: "#E63946",
+    primaryHover: "#FF4D5A",
+    primaryLight: "rgba(230,57,70,0.15)",
+    secondary: "#2B2D42",
+    secondaryHover: "#3A3D52",
+    text: "#F5F5F5",
+    textSecondary: "#B0B0B8",
+    textMuted: "#707078",
+    textInverse: "#0A0A0A",
+    accent: "#E63946",
+    accentHover: "#FF4D5A",
+    border: "rgba(230,57,70,0.25)",
+    borderLight: "rgba(230,57,70,0.10)",
+    success: "#2ECC71",
+    error: "#E63946",
+    warning: "#F39C12",
+    info: "#3498DB",
+    gradientHero: "linear-gradient(180deg, #0A0A0A 0%, rgba(10,10,10,0.4) 50%, #0A0A0A 100%)",
+    gradientSection: "linear-gradient(180deg, #0A0A0A 0%, #141414 100%)",
+    gradientCard: "linear-gradient(135deg, rgba(230,57,70,0.08) 0%, rgba(230,57,70,0.02) 100%)",
+  },
+  typography: {
+    headingFont: "'Bebas Neue', 'Anton', sans-serif",
+    bodyFont: "'Inter', 'DM Sans', sans-serif",
+    monoFont: "'JetBrains Mono', monospace",
+    scale: {
+      display: "clamp(5rem, 12vw, 10rem)",
+      h1: "clamp(3.5rem, 8vw, 6rem)",
+      h2: "clamp(2.5rem, 5vw, 4rem)",
+      h3: "clamp(1.6rem, 3vw, 2.4rem)",
+      h4: "clamp(1.2rem, 2vw, 1.8rem)",
+      h5: "clamp(1rem, 1.5vw, 1.3rem)",
+      body: "1rem",
+      small: "0.875rem",
+      caption: "0.75rem",
+    },
+    weight: { light: 300, regular: 400, medium: 500, semibold: 600, bold: 700, extrabold: 900 },
+    letterSpacing: { tight: "-0.02em", normal: "0.04em", wide: "0.12em" },
+    lineHeight: { tight: 0.9, normal: 1.5, relaxed: 1.8 },
+  },
+  spacing: {
+    section: "clamp(5rem, 12vw, 10rem)",
+    sectionInner: "clamp(3rem, 8vw, 6rem)",
+    element: "clamp(1.5rem, 4vw, 2.5rem)",
+    card: "1.75rem",
+    gap: "1.5rem",
+    gapSmall: "0.75rem",
+    padding: "1.5rem",
+    container: "1400px",
+  },
+  borderRadius: { none: "0", sm: "0", md: "0", lg: "4px", xl: "8px", "2xl": "12px", full: "9999px" },
+  shadows: {
+    none: "none",
+    xs: "0 2px 0 rgba(230,57,70,0.2)",
+    sm: "0 4px 0 rgba(230,57,70,0.3)",
+    md: "0 6px 0 rgba(230,57,70,0.4)",
+    lg: "0 8px 24px rgba(230,57,70,0.25)",
+    xl: "0 12px 48px rgba(230,57,70,0.3)",
+    "2xl": "0 20px 80px rgba(230,57,70,0.4)",
+    glow: "0 0 30px rgba(230,57,70,0.5), 0 0 60px rgba(230,57,70,0.2)",
+    glowStrong: "0 0 50px rgba(230,57,70,0.7), 0 0 100px rgba(230,57,70,0.3)",
+    inner: "inset 0 2px 4px rgba(0,0,0,0.3)",
+  },
+  motion: {
+    duration: { instant: 100, fast: 200, normal: 350, slow: 600, slower: 900 },
+    easing: {
+      easeOut: [0.25, 0.46, 0.45, 0.94],
+      easeIn: [0.55, 0.085, 0.68, 0.53],
+      easeInOut: [0.42, 0, 0.58, 1],
+      spring: { stiffness: 300, damping: 12, mass: 1 },
+      bounce: { stiffness: 400, damping: 8 },
+    },
+    stagger: 0.06,
+  },
+  glassmorphism: { enabled: true, blur: "20px", opacity: 0.05, borderOpacity: 0.15 },
+};
+
+export const NAV_HEIGHT = 72;
+export const MOBILE_BREAKPOINT = 768;

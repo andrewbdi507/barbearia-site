@@ -1,0 +1,53 @@
+{
+  "name": "Luxury",
+  "version": "1.0.0",
+  "author": "AgendaOS Design Team",
+  "description": "Tema luxuoso e sofisticado — inspirado em marcas de moda premium, hotéis 5 estrelas e barbearias de alto padrão. Preto profundo com detalhes em dourado, tipografia serifada elegante e animações suaves e deliberadas.",
+  "category": "luxury",
+  "tags": ["premium", "gold", "elegant", "dark", "serif", "refined"],
+  "style": {
+    "mood": "Elegante, sofisticado, exclusivo",
+    "target": "Barbearias premium, público de alto poder aquisitivo",
+    "inspiration": "Tom Ford, Louis Vuitton, Four Seasons, Bulgari"
+  },
+  "colors": {
+    "background": "#080808",
+    "surface": "#111111",
+    "surfaceAlt": "#1A1A1A",
+    "surfaceHover": "#222222",
+    "primary": "#C9A84C",
+    "primaryHover": "#D4B86A",
+    "primaryLight": "rgba(201,168,76,0.12)",
+    "secondary": "#1A1A2E",
+    "secondaryHover": "#252540",
+    "text": "#F5F0E8",
+    "textSecondary": "#C0BCB0",
+    "textMuted": "#7A7668",
+    "textInverse": "#080808",
+    "accent": "#E8D5A3",
+    "accentHover": "#F0E4C0",
+    "border": "rgba(201,168,76,0.20)",
+    "borderLight": "rgba(201,168,76,0.08)",
+    "success": "#4A7C59",
+    "error": "#B85450",
+    "warning": "#C9A84C",
+    "info": "#8BA4B0",
+    "gradientHero": "linear-gradient(180deg, #080808 0%, rgba(8,8,8,0.3) 50%, #080808 100%)",
+    "gradientSection": "linear-gradient(180deg, #080808 0%, #111111 100%)",
+    "gradientCard": "linear-gradient(135deg, rgba(201,168,76,0.06) 0%, rgba(201,168,76,0.01) 100%)"
+  },
+  "typography": {
+    "headingFont": "'Playfair Display', 'Cormorant Garamond', serif",
+    "bodyFont": "'Lora', 'Cormorant Garamond', serif",
+    "monoFont": "'JetBrains Mono', monospace",
+    "scale": { "display": "clamp(3.5rem, 8vw, 7rem)", "h1": "clamp(2.8rem, 6vw, 5rem)", "h2": "clamp(2rem, 4vw, 3.5rem)", "h3": "clamp(1.4rem, 2.5vw, 2.2rem)", "h4": "clamp(1.1rem, 2vw, 1.6rem)", "h5": "clamp(1rem, 1.5vw, 1.2rem)", "body": "1.1rem", "small": "0.9rem", "caption": "0.8rem" },
+    "weight": { "light": 300, "regular": 400, "medium": 500, "semibold": 600, "bold": 700, "extrabold": 900 },
+    "letterSpacing": { "tight": "-0.01em", "normal": "0.04em", "wide": "0.15em" },
+    "lineHeight": { "tight": 1.1, "normal": 1.8, "relaxed": 2.0 }
+  },
+  "spacing": { "section": "clamp(6rem, 14vw, 12rem)", "sectionInner": "clamp(4rem, 10vw, 8rem)", "element": "clamp(2rem, 5vw, 3rem)", "card": "2.5rem", "gap": "2rem", "gapSmall": "1rem", "padding": "2rem", "container": "1280px" },
+  "borderRadius": { "none": "0", "sm": "2px", "md": "4px", "lg": "8px", "xl": "16px", "2xl": "24px", "full": "9999px" },
+  "shadows": { "none": "none", "xs": "0 1px 3px rgba(0,0,0,0.3)", "sm": "0 2px 8px rgba(0,0,0,0.4)", "md": "0 4px 20px rgba(0,0,0,0.5)", "lg": "0 8px 40px rgba(0,0,0,0.6)", "xl": "0 16px 64px rgba(0,0,0,0.7)", "2xl": "0 24px 96px rgba(0,0,0,0.8)", "glow": "0 0 40px rgba(201,168,76,0.2), 0 0 80px rgba(201,168,76,0.08)", "glowStrong": "0 0 60px rgba(201,168,76,0.3), 0 0 120px rgba(201,168,76,0.12)", "inner": "inset 0 1px 3px rgba(0,0,0,0.4)" },
+  "motion": { "duration": { "instant": 100, "fast": 400, "normal": 700, "slow": 1000, "slower": 1500 }, "easing": { "easeOut": [0.25, 0.1, 0.25, 1], "easeIn": [0.4, 0, 1, 1], "easeInOut": [0.45, 0, 0.55, 1], "spring": { "stiffness": 80, "damping": 22, "mass": 1.2 }, "bounce": { "stiffness": 200, "damping": 12 } }, "stagger": 0.15 },
+  "glassmorphism": { "enabled": true, "blur": "30px", "opacity": 0.04, "borderOpacity": 0.10 }
+}

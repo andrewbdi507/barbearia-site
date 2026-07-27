@@ -94,6 +94,11 @@ def _tenant_to_entity(m: TenantModel) -> Tenant:
         created_at=m.created_at,
         updated_at=m.updated_at,
         deleted_at=m.deleted_at,
+        address=m.address,
+        phone=m.phone,
+        email=m.email,
+        whatsapp=m.whatsapp,
+        map_embed_url=m.map_embed_url,
     )
     if m.settings:
         tenant.settings = _settings_to_entity(m.settings)

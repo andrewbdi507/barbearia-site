@@ -17,6 +17,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.infrastructure.database.session import get_async_session
 from app.modules.site.application.dto import (
+    FAQResponse,
+    FAQUpdateRequest,
     PageResponse,
     PageUpdateRequest,
     SEOUpdateRequest,
@@ -25,6 +27,7 @@ from app.modules.site.application.dto import (
 )
 from app.modules.site.application.site_service import SiteService
 from app.modules.site.infrastructure.repository import (
+    FAQRepository,
     SEORepository,
     SiteContentRepository,
     SitePageRepository,
@@ -44,6 +47,7 @@ def _get_service(session: AsyncSession) -> SiteService:
         page_repo=SitePageRepository(session),
         seo_repo=SEORepository(session),
         content_repo=SiteContentRepository(session),
+        faq_repo=FAQRepository(session),
     )
 
 
@@ -104,6 +108,11 @@ async def get_site(
         "name": tenant.name,
         "subdomain": tenant.subdomain.value,
         "status": tenant.status,
+        "address": tenant.address,
+        "phone": tenant.phone,
+        "email": tenant.email,
+        "whatsapp": tenant.whatsapp,
+        "map_embed_url": tenant.map_embed_url,
     }
 
     branding = {}
@@ -281,3 +290,39 @@ async def admin_update_content(
     svc = _get_service(session)
     c = await svc.update_content(tenant["id"], **body.model_dump(exclude_none=True))
     return SiteContentResponse(**c.__dict__)
+
+
+# ============================================================
+# ADMIN API — FAQ
+# ============================================================
+
+@admin_router.get("/faq", response_model=list[FAQResponse])
+async def admin_list_faq(
+    tenant: dict = Depends(get_current_tenant),
+    session: AsyncSession = Depends(get_async_session),
+) -> list[FAQResponse]:
+    svc = _get_service(session)
+    items = await svc.list_faq(tenant["id"])
+    return [FAQResponse(id=f.id, question=f.question, answer=f.answer, sort_order=f.sort_order) for f in items]
+
+
+@admin_router.put("/faq", response_model=FAQResponse)
+async def admin_upsert_faq(
+    body: FAQUpdateRequest,
+    tenant: dict = Depends(get_current_tenant),
+    session: AsyncSession = Depends(get_async_session),
+) -> FAQResponse:
+    svc = _get_service(session)
+    result = await svc.upsert_faq(tenant["id"], **body.model_dump())
+    return FAQResponse(id=result.id, question=result.question, answer=result.answer, sort_order=result.sort_order)
+
+
+@admin_router.delete("/faq/{faq_id}")
+async def admin_delete_faq(
+    faq_id: str,
+    tenant: dict = Depends(get_current_tenant),
+    session: AsyncSession = Depends(get_async_session),
+) -> dict:
+    svc = _get_service(session)
+    await svc.delete_faq(faq_id)
+    return {"status": "deleted"}

@@ -47,13 +47,18 @@ class MediaService:
         # 4. Generate unique filename
         safe_filename = ImageProcessor.generate_filename(filename, content_hash)
 
-        # 5. Process image (resize, strip EXIF, etc.)
-        meta = ImageProcessor.process_image(file_data, safe_filename) if mime_type.startswith("image/") else {}
+        # 5. Process image (resize, strip EXIF, thumbnail)
+        meta: dict[str, Any] = {}
+        upload_bytes = file_data
+        if mime_type.startswith("image/"):
+            result = ImageProcessor.process_image(file_data, safe_filename)
+            meta = result.get("metadata", {})
+            upload_bytes = result.get("processed_image", file_data)
 
         # 6. Upload to storage provider
         storage_path = ImageProcessor.get_tenant_path(tenant_id, safe_filename)
         provider = self._get_storage_provider()
-        url = await provider.upload(file_data, storage_path, mime_type)
+        url = await provider.upload(upload_bytes, storage_path, mime_type)
 
         # 7. Create media asset
         asset = MediaAsset(

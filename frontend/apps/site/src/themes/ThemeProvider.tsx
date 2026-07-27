@@ -17,6 +17,9 @@ interface ThemeContextValue {
   setTheme: (id: string) => void;
   themes: Theme[];
   isLoading: boolean;
+  /** Dados completos do site retornados pela API (/api/v1/site).
+   *  null = API não respondeu ainda ou falhou (usa fallback). */
+  siteData: Record<string, unknown> | null;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -46,12 +49,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     return localStorage.getItem("barbershop_site_theme") || DEFAULT_ID;
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [siteData, setSiteData] = useState<Record<string, unknown> | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
-      // Try API with 4s timeout (CORS failure won't hang)
       try {
         const host = window.location.hostname;
         const parts = host.split(".");
@@ -74,15 +77,20 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           const branding = data.branding || {};
           const apiTheme = branding.theme;
 
+          if (!cancelled) {
+            setSiteData(data); // armazena resposta completa
+          }
+
           if (apiTheme && allThemes[apiTheme] && !cancelled) {
             setThemeId(apiTheme);
             localStorage.setItem("barbershop_site_theme", apiTheme);
             applyFullTheme(apiTheme);
-            return; // skip fallback
+            setIsLoading(false);
+            return;
           }
         }
       } catch {
-        // CORS / timeout / offline → use fallback silently
+        // CORS / timeout / offline → siteData permanece null (fallback)
       }
 
       // Fallback: localStorage
@@ -119,7 +127,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setTheme,
     themes: Object.values(allThemes),
     isLoading,
-  }), [currentTheme, themeId, setTheme, isLoading]);
+    siteData,
+  }), [currentTheme, themeId, setTheme, isLoading, siteData]);
 
   if (isLoading) {
     return (

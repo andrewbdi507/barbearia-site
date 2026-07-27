@@ -1,6 +1,6 @@
 """Media Module — Image Processor.
 
-Pipeline: validate → strip EXIF → resize (max 2000px) → thumbnail (400px) → WebP.
+Pipeline: validate → strip EXIF → resize (max 2000px) → thumbnail (400px).
 """
 
 from __future__ import annotations
@@ -9,12 +9,11 @@ import hashlib
 import io
 from typing import Any
 
+from PIL import Image
+
 
 class ImageProcessor:
-    """Processador de imagens.
-
-    No MVP usa Pillow. Em produção pode usar sharp/libvips.
-    """
+    """Processador de imagens com Pillow."""
 
     ALLOWED_MIME_TYPES = {
         "image/jpeg", "image/png", "image/webp",
@@ -51,22 +50,83 @@ class ImageProcessor:
         return f"{tenant_id}/{filename}"
 
     @classmethod
-    def process_image(cls, data: bytes, filename: str) -> dict[str, Any]:
-        """Processa imagem: strip EXIF, resize, thumbnail, WebP.
+    def _strip_exif(cls, img: Image.Image) -> Image.Image:
+        """Remove dados EXIF da imagem.
 
-        Retorna metadados (width, height, etc.).
+        Cria uma nova imagem sem metadados, preservando os pixels.
         """
-        # No MVP, retorna metadados mockados
-        # Em produção, usa Pillow:
-        # from PIL import Image
-        # img = Image.open(io.BytesIO(data))
-        # img = cls._strip_exif(img)
-        # img.thumbnail((cls.MAX_DIMENSION, cls.MAX_DIMENSION))
-        # ...
+        data = list(img.getdata())
+        clean = Image.new(img.mode, img.size)
+        clean.putdata(data)
+        return clean
+
+    @classmethod
+    def _resize_proportional(cls, img: Image.Image, max_dimension: int) -> Image.Image:
+        """Redimensiona mantendo proporção — lado maior ≤ max_dimension."""
+        w, h = img.size
+        if w <= max_dimension and h <= max_dimension:
+            return img.copy()
+        ratio = max_dimension / max(w, h)
+        new_size = (int(w * ratio), int(h * ratio))
+        return img.resize(new_size, Image.LANCZOS)
+
+    @classmethod
+    def _to_bytes(cls, img: Image.Image, fmt: str) -> bytes:
+        """Converte imagem PIL para bytes no formato original."""
+        buf = io.BytesIO()
+        save_fmt = "JPEG" if fmt.lower() in ("jpg", "jpeg") else fmt.upper()
+        if save_fmt == "JPEG":
+            img = img.convert("RGB")  # JPEG não suporta RGBA
+        img.save(buf, format=save_fmt, quality=90, optimize=True)
+        return buf.getvalue()
+
+    @classmethod
+    def process_image(cls, data: bytes, filename: str) -> dict[str, Any]:
+        """Pipeline completo de processamento de imagem.
+
+        1. Abre a imagem com Pillow
+        2. Detecta largura, altura e formato reais
+        3. Remove EXIF
+        4. Redimensiona (max 2000px, proporcional)
+        5. Gera thumbnail (max 400px, proporcional)
+
+        Returns:
+            {
+                "metadata": {width, height, format, size_bytes},
+                "processed_image": bytes,
+                "thumbnail": bytes,
+            }
+        """
+        ext = filename.lower().rsplit(".", 1)[-1] if "." in filename else "jpg"
+
+        img = Image.open(io.BytesIO(data))
+
+        # Metadados reais da imagem original
+        original_w, original_h = img.size
+        img_format = img.format or ext.upper()
+
+        # Strip EXIF
+        img = cls._strip_exif(img)
+
+        # Resize proporcional (max 2000px)
+        main_img = cls._resize_proportional(img, cls.MAX_DIMENSION)
+
+        # Gerar thumbnail (max 400px)
+        thumb_img = cls._resize_proportional(img, cls.THUMBNAIL_DIMENSION)
+
+        # Converter para bytes
+        main_bytes = cls._to_bytes(main_img, img_format)
+        thumb_bytes = cls._to_bytes(thumb_img, img_format)
 
         return {
-            "width": 1200,
-            "height": 800,
-            "format": filename.rsplit(".", 1)[-1] if "." in filename else "jpg",
-            "size_bytes": len(data),
+            "metadata": {
+                "width": main_img.width,
+                "height": main_img.height,
+                "original_width": original_w,
+                "original_height": original_h,
+                "format": img_format.lower(),
+                "size_bytes": len(main_bytes),
+            },
+            "processed_image": main_bytes,
+            "thumbnail": thumb_bytes,
         }
